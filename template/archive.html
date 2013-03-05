@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% for post in posts %}
+<article onclick="window.location.href='{{post.computed_link}}';">
+  <h1><a href="{{post.computed_link}}">{{post.title}}</a></h1>
+  <p>
+    {{post.description}}
+  </p>
+</article>
+{% endfor %}
+{% endblock %}

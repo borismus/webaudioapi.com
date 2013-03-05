@@ -1,0 +1,38 @@
+<!doctype html>
+<head>
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+
+<title>{{title}} | {{site_title}}</title>
+
+<link rel="stylesheet" href="/static/style.css" type="text/css" media="screen" />
+</head>
+
+<body>
+
+<div id="container">
+
+  <div id="nav">
+    <ul>
+      <li><a href="/book">Book</a></li>
+      <li><a href="/samples">Samples</a>
+      </li>
+    </ul>
+  </div>
+
+  <div id="header">
+    <h1><a href="/">{{site_title}}</a></h1>
+  </div>
+
+
+  <div id="wrapper">
+    <div id="content">
+
+      {% block content %}{% endblock %}
+
+    </div>
+
+  </div>
+
+  </body>
+  </html>
+

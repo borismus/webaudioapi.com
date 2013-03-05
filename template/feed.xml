@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"
+      xml:lang="en"
+      xml:base="http://smus.com">
+  <title>{{title}}</title>
+  <link href="http://smus.com/atom.xml" rel="self"/>
+  <link href="http://smus.com"/>
+  <updated>{{rfc}}</updated>
+  <id>http://smus.com/atom.xml</id>
+  {{#posts}}
+  <entry>
+    <title>{{title}}</title>
+    <author><name>Boris Smus</name></author>
+    <link href="{{permalink}}"/>
+    {{#posted_info}}
+    <updated>{{rfc}}</updated>
+    {{/posted_info}}
+    <id>{{permalink}}</id>
+    <content type="html">
+      {{content}}
+    </content>
+  </entry>
+  {{/posts}}
+</feed>
