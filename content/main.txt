@@ -2,4 +2,11 @@ Welcome
 =======
 type: index
 
-Sup.
+Other web audio resources:
+
+- [Web Audio API W3C specification](https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html)
+- [Getting started with the Web Audio API](http://www.html5rocks.com/en/tutorials/webaudio/intro/)
+- [Developing game audio with the Web Audio API](http://www.html5rocks.com/en/tutorials/webaudio/games/)
+- [Scheduling Web Audio with precision](http://www.html5rocks.com/en/tutorials/audio/scheduling/)
+- [Web MIDI API W3C specification](http://webaudio.github.com/web-midi-api/)
+- [Web Audio playground](http://webaudioplayground.appspot.com/)
