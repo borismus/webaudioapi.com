@@ -1,0 +1,6 @@
+Book
+=======
+type: page
+
+The content of the book will be available here for free. For now, check
+out <http://shop.oreilly.com/product/0636920025948.do>.

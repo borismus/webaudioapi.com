@@ -1,0 +1,5 @@
+Welcome
+=======
+type: index
+
+Sup.

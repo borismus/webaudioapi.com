@@ -1,0 +1,161 @@
+<!doctype html>
+<head>
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+</head>
+
+<style>
+</style>
+
+<div id="container">
+
+  
+  <div class="sample" onclick="window.location.href = 'audio-tag';">
+    <div class="name">Audio Tag</div>
+    <div class="info">
+      <p><p>Illustrates the use of MediaElementAudioSourceNode to wrap the audio
+tag.</p>
+<p>A couple issues: <code>onload</code> is required <a href="http://crbug.com/112368">http://crbug.com/112368</a>. Also,
+reassigning the <code>@src</code> attribute causes audio glitches
+<a href="http://crbug.com/162528">http://crbug.com/162528</a>.</p></p>
+      <a class="source" href="audio-tag/audio-tag-sample.js">audio-tag-sample.js</a>
+    </div>
+  </div>
+  
+  <div class="sample" onclick="window.location.href = 'crossfade';">
+    <div class="name">Crossfade</div>
+    <div class="info">
+      <p><p>Equal-power crossfading to mix between two tracks.</p></p>
+      <a class="source" href="crossfade/crossfade-sample.js">crossfade-sample.js</a>
+    </div>
+  </div>
+  
+  <div class="sample" onclick="window.location.href = 'crossfade-playlist';">
+    <div class="name">Crossfade Playlist</div>
+    <div class="info">
+      <p><p>Automatic crossfading between songs (as in a playlist).</p></p>
+      <a class="source" href="crossfade-playlist/crossfade-playlist-sample.js">crossfade-playlist-sample.js</a>
+    </div>
+  </div>
+  
+  <div class="sample" onclick="window.location.href = 'filter';">
+    <div class="name">Filter</div>
+    <div class="info">
+      <p><p>Apply a simple biquad filter to a sound. Lets you tweak frequency
+and Q values.</p></p>
+      <a class="source" href="filter/filter-sample.js">filter-sample.js</a>
+    </div>
+  </div>
+  
+  <div class="sample" onclick="window.location.href = 'frequency-response';">
+    <div class="name">Frequency Response</div>
+    <div class="info">
+      <p><p>A sample showing the frequency response graphs of various kinds of
+BiquadFilterNodes.</p></p>
+      <a class="source" href="frequency-response/frequency-response-sample.js">frequency-response-sample.js</a>
+    </div>
+  </div>
+  
+  <div class="sample" onclick="window.location.href = 'metering';">
+    <div class="name">Metering</div>
+    <div class="info">
+      <p><p>Lets you adjust gain and show when clipping happens.</p></p>
+      <a class="source" href="metering/metering-sample.js">metering-sample.js</a>
+    </div>
+  </div>
+  
+  <div class="sample" onclick="window.location.href = 'microphone';">
+    <div class="name">Microphone</div>
+    <div class="info">
+      <p><p>Integrating <code>getUserMedia</code> and the Web Audio API.</p></p>
+      <a class="source" href="microphone/microphone-sample.js">microphone-sample.js</a>
+    </div>
+  </div>
+  
+  <div class="sample" onclick="window.location.href = 'oscillator';">
+    <div class="name">Oscillator</div>
+    <div class="info">
+      <p><p>Generating basic tones at various frequencies using the <code>OscillatorNode</code>.</p></p>
+      <a class="source" href="oscillator/oscillator-sample.js">oscillator-sample.js</a>
+    </div>
+  </div>
+  
+  <div class="sample" onclick="window.location.href = 'procedural';">
+    <div class="name">Procedural</div>
+    <div class="info">
+      <p><p>Procedurally generated gunshot sounds.</p></p>
+      <a class="source" href="procedural/procedural-sample.js">procedural-sample.js</a>
+    </div>
+  </div>
+  
+  <div class="sample" onclick="window.location.href = 'rapid-sounds';">
+    <div class="name">Rapid Sounds</div>
+    <div class="info">
+      <p><p>Many sound effects playing nearly simultaneously. Illustrates pitch and
+temporal randomness.</p></p>
+      <a class="source" href="rapid-sounds/rapid-sounds-sample.js">rapid-sounds-sample.js</a>
+    </div>
+  </div>
+  
+  <div class="sample" onclick="window.location.href = 'rhythm';">
+    <div class="name">Rhythm</div>
+    <div class="info">
+      <p><p>Illustrating the API's precise timing model by playing back a simple
+rhythm.</p></p>
+      <a class="source" href="rhythm/rhythm-sample.js">rhythm-sample.js</a>
+    </div>
+  </div>
+  
+  <div class="sample" onclick="window.location.href = 'room-effects';">
+    <div class="name">Room Effects</div>
+    <div class="info">
+      <p><p>Using <code>ConvolverNode</code> and impulse response samples to illustrate various
+kinds of room effects.</p></p>
+      <a class="source" href="room-effects/room-effects-sample.js">room-effects-sample.js</a>
+    </div>
+  </div>
+  
+  <div class="sample" onclick="window.location.href = 'script-processor';">
+    <div class="name">Script Processor</div>
+    <div class="info">
+      <p><p>A sample that shows the ScriptProcessorNode in action.</p></p>
+      <a class="source" href="script-processor/script-processor-sample.js">script-processor-sample.js</a>
+    </div>
+  </div>
+  
+  <div class="sample" onclick="window.location.href = 'spatialized';">
+    <div class="name">Spatialized</div>
+    <div class="info">
+      <p><p>Spatialized audio in 2D. Pick direction and position of the sound
+source relative to the listener.</p></p>
+      <a class="source" href="spatialized/spatialized-sample.js">spatialized-sample.js</a>
+    </div>
+  </div>
+  
+  <div class="sample" onclick="window.location.href = 'value-curve';">
+    <div class="name">Value Curve</div>
+    <div class="info">
+      <p><p>Sets a sinusoidal value timing curve for a tremolo effect. Also does the
+same thing with an oscillator-based LFO.</p></p>
+      <a class="source" href="value-curve/value-curve-sample.js">value-curve-sample.js</a>
+    </div>
+  </div>
+  
+  <div class="sample" onclick="window.location.href = 'visualizer';">
+    <div class="name">Visualizer</div>
+    <div class="info">
+      <p><p>Using the AnalyserNode and some Canvas 2D visualizations to show both
+time- and frequency- domain.</p></p>
+      <a class="source" href="visualizer/visualizer-sample.js">visualizer-sample.js</a>
+    </div>
+  </div>
+  
+  <div class="sample" onclick="window.location.href = 'volume';">
+    <div class="name">Volume</div>
+    <div class="info">
+      <p><p>A very simple example that lets you change the volume using a <code>GainNode</code>.</p></p>
+      <a class="source" href="volume/volume-sample.js">volume-sample.js</a>
+    </div>
+  </div>
+  
+
+</div>

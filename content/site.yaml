@@ -1,0 +1,10 @@
+site_title: Web Audio API
+date_format: '%Y-%m-%d'
+verbs:
+  page: 'Created'
+  post: 'Written'
+permalink_format:
+  page: '{{slug}}'
+  post: 'samples/{{slug}}'
+  archive: '{{slug}}'
+  index: ''
