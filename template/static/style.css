@@ -1,7 +1,6 @@
 body {
   background: black;
   font-family: 'Open Sans', sans-serif;
-  font-weight: bold;
   color: #ccc;
 }
 
@@ -16,16 +15,23 @@ body {
 #header h1 { margin: 0; }
 #nav ul { margin: 0; }
 #nav li {
+  font-weight: bold;
   float: right;
   list-style: none;
   margin-left: 10px;
 }
 
 #header a, #nav a { color: rgb(28, 161, 202); text-decoration: none; }
-#header a:hover, #nav a:hover { color: rgb(38, 181, 222); text-decoration: none; }
+#header a:hover, #nav a:hover { color: rgb(157, 204, 255); text-decoration: underline; }
 
+article a { color: #FEFEF2; text-decoration: none; }
+article a:hover { color: white; text-decoration: underline; }
+
+a { color: #FEF0C9; text-decoration: none; }
+a:hover { color: #FEF6E4; text-decoration: underline; }
 
 article {
+  font-weight: bold;
   margin: 20px;
   padding: 20px;
   text-align: center;

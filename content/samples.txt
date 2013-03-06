@@ -1,5 +1,5 @@
-Samples List.
-===========
+Samples
+=======
 list:
 type: archive
 limit: 100

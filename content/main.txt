@@ -2,11 +2,27 @@ Welcome
 =======
 type: index
 
+This site started as a place to host Web Audio [samples][] for an
+upcoming Web Audio API [book][]. However, the front page seems like a
+fine place to include more information about the Web Audio API.
+
 Other web audio resources:
 
 - [Web Audio API W3C specification](https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html)
+- [Web Audio Examples](http://chromium.googlecode.com/svn/trunk/samples/audio/index.html)
 - [Getting started with the Web Audio API](http://www.html5rocks.com/en/tutorials/webaudio/intro/)
 - [Developing game audio with the Web Audio API](http://www.html5rocks.com/en/tutorials/webaudio/games/)
 - [Scheduling Web Audio with precision](http://www.html5rocks.com/en/tutorials/audio/scheduling/)
 - [Web MIDI API W3C specification](http://webaudio.github.com/web-midi-api/)
 - [Web Audio playground](http://webaudioplayground.appspot.com/)
+
+If you'd like to change something about this site (eg. add a link to
+your blog post, add a new sample to the list, want to tweak the design),
+or have some other idea, submit a pull request to the [github repo][gh],
+or drop me a line.
+
+-- Boris ([@borismus](https://twitter.com/borismus))
+
+[samples]: /samples
+[book]: /book
+[gh]: https://github.com/borismus/webaudioapi.com
