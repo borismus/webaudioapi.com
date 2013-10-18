@@ -15,6 +15,7 @@ Other web audio resources:
 - [Scheduling Web Audio with precision](http://www.html5rocks.com/en/tutorials/audio/scheduling/)
 - [Web MIDI API W3C specification](http://webaudio.github.com/web-midi-api/)
 - [Web Audio playground](http://webaudioplayground.appspot.com/)
+- [Web Audio browser support test](http://www.doboism.com/projects/webaudio-compatibility/)
 
 If you'd like to change something about this site (eg. add a link to
 your blog post, add a new sample to the list, want to tweak the design),
