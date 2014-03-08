@@ -27,7 +27,7 @@ function ValueCurveSample() {
 };
 
 ValueCurveSample.prototype.play = function() {
-  this.gainNode = context.createGainNode();
+  this.gainNode = context.createGain();
   this.source = context.createBufferSource();
   this.source.buffer = this.buffer;
 
@@ -38,7 +38,7 @@ ValueCurveSample.prototype.play = function() {
   this.gainNode.gain.value = 0.3;
   // Start playback in a loop
   this.source.loop = true;
-  this.source.start(0);
+  this.source[this.source.start ? 'start': 'noteOn'](0);
 };
 
 ValueCurveSample.prototype.setValueCurve = function(element) {
@@ -69,12 +69,12 @@ ValueCurveSample.prototype.setLFO = function() {
   //osc.connect(this.source.playbackRate);
 
   // Start immediately, and stop in 2 seconds.
-  osc.start(0);
-  osc.stop(context.currentTime + this.duration);
+  osc[osc.start ? 'start': 'noteOn'](0);
+  osc[osc.stop ? 'stop': 'noteOff'](context.currentTime + this.duration);
 };
 
 ValueCurveSample.prototype.stop = function() {
-  this.source.stop(0);
+  this.source[this.source.stop ? 'stop': 'noteOff'](0);
 };
 
 ValueCurveSample.prototype.toggle = function() {

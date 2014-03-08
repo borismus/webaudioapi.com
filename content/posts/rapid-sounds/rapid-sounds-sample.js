@@ -37,14 +37,15 @@ RapidSoundsSample.prototype.shootRound = function(type, rounds, interval, random
   // Make multiple sources using the same buffer and play in quick succession.
   for (var i = 0; i < rounds; i++) {
     var source = this.makeSource(this.buffers[type]);
-    source.playbackRate.value = 1 + Math.random() * random2;
-    source.start(time + i * interval + Math.random() * random);
+    if (random2)
+      source.playbackRate.value = 1 + Math.random() * random2;
+    source[source.start ? 'start' : 'noteOn'](time + i * interval + Math.random() * random);
   }
 }
 
 RapidSoundsSample.prototype.makeSource = function(buffer) {
   var source = context.createBufferSource();
-  var gain = context.createGainNode();
+  var gain = context.createGain();
   gain.gain.value = 0.2;
   source.buffer = buffer;
   source.connect(gain);

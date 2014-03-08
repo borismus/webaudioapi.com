@@ -50,7 +50,7 @@ function WhiteNoiseGenerated(callback) {
   this.node = context.createBufferSource();
   this.node.buffer = buffer;
   this.node.loop = true;
-  this.node.start(0);
+  this.node[this.node.start ? 'start' : 'noteOn'](0);
 }
 
 WhiteNoiseGenerated.prototype.connect = function(dest) {
@@ -103,7 +103,7 @@ ProceduralSample.prototype.onLoaded = function() {
     this.voices.push(voice);
   }
 
-  var gainMaster = context.createGainNode();
+  var gainMaster = context.createGain();
   gainMaster.gain.value = 5;
   filter.connect(gainMaster);
 

@@ -65,9 +65,9 @@ RoomEffectsSample.prototype.playPause = function() {
     this.source = source;
     this.convolver = convolver;
     // Start playback.
-    this.source.start(0);
+    this.source[this.source.start ? 'start': 'noteOn'](0);
   } else {
-    this.source.stop(0);
+    this.source[this.source.stop ? 'stop': 'noteOff'](0);
   }
   this.isPlaying = !this.isPlaying;
 };

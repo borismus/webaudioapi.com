@@ -12,6 +12,7 @@ description:
   #slider { margin: 10px; }
 </style>
 
+<script src="/static/js/shared.js"></script>
 <script type="text/javascript" src="frequency-response-sample.js"></script>
 
 

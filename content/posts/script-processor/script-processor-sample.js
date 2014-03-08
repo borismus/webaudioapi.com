@@ -41,13 +41,13 @@ ScriptSample.prototype.play = function() {
   processor.connect(context.destination);
 
   console.log('start');
-  source.start(0);
+  source[source.start ? 'start': 'noteOn'](0);
   this.source = source;
 };
 
 ScriptSample.prototype.stop = function() {
   console.log('stop');
-  this.source.stop(0);
+  this.source[this.source.stop ? 'stop': 'noteOff'](0);
 };
 
 ScriptSample.prototype.onProcess = function(e) {

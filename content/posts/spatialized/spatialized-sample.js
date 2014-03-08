@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+var wheelEvent = 'onwheel' in document.createElement('div') ? 'wheel' :
+                 document.onmousewheel !== undefined ? 'mousewheel' : 'DOMMouseScroll';
+
 
 // Draws a canvas and tracks mouse click/drags on the canvas.
 function Field(canvas) {
@@ -35,7 +38,7 @@ function Field(canvas) {
   canvas.addEventListener('mousemove', function() {
     obj.handleMouseMove.apply(obj, arguments)
   });
-  canvas.addEventListener('mousewheel', function() {
+  canvas.addEventListener(wheelEvent, function() {
     obj.handleMouseWheel.apply(obj, arguments);
   });
   // Setup keyboard listener
@@ -95,7 +98,10 @@ Field.prototype.handleMouseOut = function(e) {
 Field.prototype.handleMouseMove = function(e) {
   if (this.isMouseInside) {
     // Update the position.
-    this.point = {x: e.offsetX, y: e.offsetY};
+    this.point = {
+      x: e.offsetX == undefined ? (e.layerX - e.currentTarget.offsetLeft) : e.offsetX,
+      y: e.offsetY == undefined ? (e.layerY - e.currentTarget.offsetTop) : e.offsetY
+    };
     // Re-render the canvas.
     this.render();
     // Callback.
@@ -118,7 +124,8 @@ Field.prototype.handleKeyDown = function(e) {
 
 Field.prototype.handleMouseWheel = function(e) {
   e.preventDefault();
-  this.changeAngleHelper(e.wheelDelta/500);
+  var delta = e.wheelDelta || (e.deltaY * -1200);
+  this.changeAngleHelper(delta/500);
 };
 
 Field.prototype.changeAngleHelper = function(delta) {
@@ -178,7 +185,7 @@ SpatializedSample.prototype.play = function() {
   // direction.
   panner.connect(context.destination);
   source.connect(panner);
-  source.start(0);
+  source[source.start ? 'start': 'noteOn'](0);
   // Position the listener at the origin.
   context.listener.setPosition(0, 0, 0);
   foo = panner;
@@ -190,7 +197,7 @@ SpatializedSample.prototype.play = function() {
 }
 
 SpatializedSample.prototype.stop = function() {
-  this.source.stop(0);
+  this.source[this.source.stop ? 'stop': 'noteOff'](0);
   this.isPlaying = false;
 }
 

@@ -34,7 +34,7 @@ FilterSample.prototype.play = function() {
   source.connect(filter);
   filter.connect(context.destination);
   // Play!
-  source.start(0);
+  source[source.start ? 'start' : 'noteOn'](0);
   source.loop = true;
   // Save source and filterNode for later access.
   this.source = source;
