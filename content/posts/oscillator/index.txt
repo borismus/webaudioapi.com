@@ -18,13 +18,13 @@ onchange="sample.changeDetune(this.value);">
 
 <div>
 <input type="radio" name="ir" value="0" class="effect" checked
-onclick="sample.changeType(0)">Sine</input>
+onclick="sample.changeType('sine')">Sine</input>
 <input type="radio" name="ir" value="1" class="effect"
-onclick="sample.changeType(1)">Square</input>
+onclick="sample.changeType('square')">Square</input>
 <input type="radio" name="ir" value="2" class="effect"
-onclick="sample.changeType(2)">Sawtooth</input>
+onclick="sample.changeType('sawtooth')">Sawtooth</input>
 <input type="radio" name="ir" value="3" class="effect"
-onclick="sample.changeType(3)">Triangle</input>
+onclick="sample.changeType('triangle')">Triangle</input>
 </div>
 
 <button onclick="sample.toggle()">Play/pause</button>

@@ -44,7 +44,7 @@ function VisualizerSample() {
 VisualizerSample.prototype.togglePlayback = function() {
   if (this.isPlaying) {
     // Stop playback
-    this.source.noteOff(0);
+    this.source[this.source.stop ? 'stop': 'noteOff'](0);
     this.startOffset += context.currentTime - this.startTime;
     console.log('paused at', this.startOffset);
     // Save the position of the play head.
@@ -57,7 +57,7 @@ VisualizerSample.prototype.togglePlayback = function() {
     this.source.buffer = this.buffer;
     this.source.loop = true;
     // Start playback, but make sure we stay in bound of the buffer.
-    this.source.start(0, this.startOffset % this.buffer.duration);
+    this.source[this.source.start ? 'start' : 'noteOn'](0, this.startOffset % this.buffer.duration);
     // Start visualizer.
     requestAnimFrame(this.draw.bind(this));
   }

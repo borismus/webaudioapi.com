@@ -31,7 +31,7 @@ OscillatorSample.prototype.play = function() {
   this.oscillator.connect(this.analyser);
   this.analyser.connect(context.destination);
 
-  this.oscillator.start(0);
+  this.oscillator[this.oscillator.start ? 'start' : 'noteOn'](0);
 
   requestAnimFrame(this.visualize.bind(this));
 };
