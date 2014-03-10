@@ -10,3 +10,8 @@ description: Procedurally generated gunshot sounds.
 <script>
 sample = new ProceduralSample();
 </script>
+
+Originally written by BBC for their radiophonic workshop [gunfire effects
+generator][bbc].
+
+[bbc]: http://webaudio.prototyping.bbc.co.uk/gunfire/

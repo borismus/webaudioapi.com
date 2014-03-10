@@ -1,5 +1,5 @@
 template: template
 content: content
-output: /Library/WebServer/Documents
+output: www
 
 deploy: webaudioapi.com

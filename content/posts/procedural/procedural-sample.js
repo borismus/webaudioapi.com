@@ -1,6 +1,4 @@
 /*
- * Copyright 2013 Boris Smus. All Rights Reserved.
-
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +10,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * This sample is a derivative of work created by 
+ *
+ * Chris Lowis <chris.lowis at bbc.co.uk>
+ * Andrew Nicolaou <andrew.nicolaou at bbc.co.uk>
+ * Matthew Paradis <matthew.paradis at bbc.co.uk>
+ *
+ * (See https://raw.github.com/bbcrd/radiophonics and COPYING)
  */
 
 
