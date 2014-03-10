@@ -31,12 +31,11 @@ MeteringSample.prototype.playPause = function() {
     source.buffer = this.buffer;
     source.loop = true;
     // Run the source node through a gain node.
-    var gain = context.createGainNode();
-    gain.gain.value = this.gainValue;
+    var gain = context.createGain();
     // Create mix node (gain node to combine everything).
-    var mix = context.createGainNode();
+    var mix = context.createGain();
     // Create meter.
-    var meter = context.createJavaScriptNode(2048, 1, 1);
+    var meter = context.createScriptProcessor(2048, 1, 1);
     var ctx = this;
     meter.onaudioprocess = function(e) { ctx.processAudio.call(ctx, e) };
     // Connect the whole sound to mix node.
@@ -50,7 +49,7 @@ MeteringSample.prototype.playPause = function() {
     this.source = source;
     this.gain = gain;
     // Start playback.
-    this.source.start(0);
+    this.source[this.source.start ? 'start' : 'noteOn'](0);
   } else {
     this.source.stop(0);
   }
@@ -91,5 +90,5 @@ MeteringSample.prototype.renderMeter = function() {
   var didRecentlyClip = (new Date() - this.lastClipTime) < 100;
   this.meterElement.className = didRecentlyClip ? 'clip' : 'noclip';
   var ctx = this;
-  webkitRequestAnimationFrame(function() { ctx.renderMeter.call(ctx) });
+  requestAnimFrame(function() { ctx.renderMeter.call(ctx) });
 }

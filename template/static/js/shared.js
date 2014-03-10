@@ -1,6 +1,13 @@
 // Start off by initializing a new context.
 context = new (window.AudioContext || window.webkitAudioContext)();
 
+if (!context.createGain)
+  context.createGain = context.createGainNode;
+if (!context.createDelay)
+  context.createDelay = context.createDelayNode;
+if (!context.createScriptProcessor)
+  context.createScriptProcessor = context.createJavaScriptNode;
+
 // shim layer with setTimeout fallback
 window.requestAnimFrame = (function(){
 return  window.requestAnimationFrame       || 
@@ -18,7 +25,7 @@ function playSound(buffer, time) {
   var source = context.createBufferSource();
   source.buffer = buffer;
   source.connect(context.destination);
-  source.start(time);
+  source[source.start ? 'start' : 'noteOn'](time);
 }
 
 function loadSounds(obj, soundMap, callback) {

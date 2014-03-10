@@ -29,7 +29,7 @@ CrossfadePlaylistSample.prototype.play = function() {
 
   function createSource(buffer) {
     var source = context.createBufferSource();
-    var gainNode = context.createGainNode();
+    var gainNode = context.createGain();
     source.buffer = buffer;
     // Connect source to gain.
     source.connect(gainNode);
@@ -64,7 +64,7 @@ CrossfadePlaylistSample.prototype.play = function() {
         gainNode.gain.linearRampToValueAtTime(0, currTime + duration);
 
         // Play the track now.
-        source.start(currTime);
+        source[source.start ? 'start' : 'noteOn'](currTime);
 
         // Increment time for the next iteration.
         currTime += duration - fadeTime;

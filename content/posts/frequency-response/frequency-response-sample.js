@@ -2,7 +2,6 @@
 // init() once the page has finished loading.
 window.onload = init;
 
-var context;
 var filter;
 var frequency = 2000;
 var resonance = 5;
@@ -248,7 +247,6 @@ function gainHandler(event, ui) {
 
 
 function initAudio() {
-    context = new webkitAudioContext();
     filter = context.createBiquadFilter();
     filter.Q.value = 5;
     filter.frequency.value = 2000;

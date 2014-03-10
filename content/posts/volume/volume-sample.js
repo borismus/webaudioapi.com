@@ -23,7 +23,7 @@ function VolumeSample() {
 };
 
 VolumeSample.prototype.play = function() {
-  this.gainNode = context.createGainNode();
+  this.gainNode = context.createGain();
   this.source = context.createBufferSource();
   this.source.buffer = this.buffer;
 
@@ -33,7 +33,7 @@ VolumeSample.prototype.play = function() {
   this.gainNode.connect(context.destination);
   // Start playback in a loop
   this.source.loop = true;
-  this.source.start(0);
+  this.source[this.source.start ? 'start' : 'noteOn'](0);
 };
 
 VolumeSample.prototype.changeVolume = function(element) {
@@ -45,7 +45,7 @@ VolumeSample.prototype.changeVolume = function(element) {
 };
 
 VolumeSample.prototype.stop = function() {
-  this.source.stop(0);
+  this.source[this.source.stop ? 'stop' : 'noteOff'](0);
 };
 
 VolumeSample.prototype.toggle = function() {

@@ -29,14 +29,15 @@ CrossfadeSample.prototype.play = function() {
   // Mute the second source.
   this.ctl1.gainNode.gain.value = 0;
   // Start playback in a loop
-  this.ctl1.source.start(0);
-  this.ctl2.source.start(0);
+  var onName = this.ctl1.source.start ? 'start' : 'noteOn';
+  this.ctl1.source[onName](0);
+  this.ctl2.source[onName](0);
   // Set the initial crossfade to be just source 1.
   this.crossfade(0);
 
   function createSource(buffer) {
     var source = context.createBufferSource();
-    var gainNode = context.createGainNode();
+    var gainNode = context.createGain();
     source.buffer = buffer;
     // Turn on looping
     source.loop = true;
@@ -53,8 +54,9 @@ CrossfadeSample.prototype.play = function() {
 };
 
 CrossfadeSample.prototype.stop = function() {
-  this.ctl1.source.noteOff(0);
-  this.ctl2.source.noteOff(0);
+  var offName = this.ctl1.source.stop ? 'stop' : 'noteOff';
+  this.ctl1.source[offName](0);
+  this.ctl2.source[offName](0);
 };
 
 // Fades between 0 (all source 1) and 1 (all source 2)
