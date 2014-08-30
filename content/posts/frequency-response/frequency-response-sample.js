@@ -64,7 +64,6 @@ function drawCurve() {
         var f = magResponse[i];
         var response = magResponse[i];
         var dbResponse = 20.0 * Math.log(response) / Math.LN10;
-        dbResponse *= 2; // simulate two chained Biquads (for 4-pole lowpass)
         
         var x = i;
         var y = dbToY(dbResponse);
