@@ -1,5 +1,5 @@
 template: template
 content: content
 output: www
-
+output_deploy: www-deploy
 deploy: webaudioapi.com

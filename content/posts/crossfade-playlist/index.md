@@ -1,8 +1,7 @@
 Crossfading Playlist
 ====================
 posted: 2013-03-03
-description: >
-  Automatic crossfading between songs (as in a playlist).
+description: Automatic crossfading between songs (as in a playlist).
 
 <input type="button" onclick="sample.play();" value="Play">
 

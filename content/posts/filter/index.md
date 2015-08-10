@@ -1,9 +1,8 @@
 Filter
 ======
 posted: 2013-03-03
-description: >
-  Apply a simple low pass filter to a sound. Lets you tweak
-  frequency and Q values.
+description: Apply a simple low pass filter to a sound. Lets you tweak frequency
+and Q values.
 
 <input type="button" onclick="sample.toggle();" value="Play/Pause">
 
