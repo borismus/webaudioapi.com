@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-var wheelEvent = 'onwheel' in document.createElement('div') ? 'wheel' :
-                 document.onmousewheel !== undefined ? 'mousewheel' : 'DOMMouseScroll';
-
 
 // Draws a canvas and tracks mouse click/drags on the canvas.
 function Field(canvas) {
@@ -38,7 +35,7 @@ function Field(canvas) {
   canvas.addEventListener('mousemove', function() {
     obj.handleMouseMove.apply(obj, arguments)
   });
-  canvas.addEventListener(wheelEvent, function() {
+  canvas.addEventListener('wheel', function() {
     obj.handleMouseWheel.apply(obj, arguments);
   });
   // Setup keyboard listener
@@ -124,8 +121,7 @@ Field.prototype.handleKeyDown = function(e) {
 
 Field.prototype.handleMouseWheel = function(e) {
   e.preventDefault();
-  var delta = e.wheelDelta || (e.deltaY * -1200);
-  this.changeAngleHelper(delta/500);
+  this.changeAngleHelper(e.deltaY/100);
 };
 
 Field.prototype.changeAngleHelper = function(delta) {
@@ -185,7 +181,7 @@ SpatializedSample.prototype.play = function() {
   // direction.
   panner.connect(context.destination);
   source.connect(panner);
-  source[source.start ? 'start': 'noteOn'](0);
+  source.start(0);
   // Position the listener at the origin.
   context.listener.setPosition(0, 0, 0);
   foo = panner;
@@ -197,7 +193,7 @@ SpatializedSample.prototype.play = function() {
 }
 
 SpatializedSample.prototype.stop = function() {
-  this.source[this.source.stop ? 'stop': 'noteOff'](0);
+  this.source.stop(0);
   this.isPlaying = false;
 }
 
@@ -220,5 +216,7 @@ SpatializedSample.prototype.changePosition = function(position) {
 SpatializedSample.prototype.changeAngle = function(angle) {
   console.log(angle);
   // Compute the vector for this angle.
-  this.panner.setOrientation(Math.cos(angle), -Math.sin(angle), 1);
+  if (this.panner) {
+    this.panner.setOrientation(Math.cos(angle), -Math.sin(angle), 1);
+  }
 };

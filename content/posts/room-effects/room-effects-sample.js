@@ -40,6 +40,10 @@ function RoomEffectsSample(inputs) {
     ctx.buffer = buffers[0];
     ctx.impulseResponses = buffers.splice(1);
     ctx.impulseResponseBuffer = ctx.impulseResponses[0];
+
+    var button = document.querySelector('button');
+    button.removeAttribute('disabled');
+    button.innerHTML = 'Play/pause';
   }
   loader.load();
 }

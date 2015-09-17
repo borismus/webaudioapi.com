@@ -5,7 +5,7 @@ description: >
   Using `ConvolverNode` and impulse response samples to illustrate various
   kinds of room effects.
 
-<button onclick="sample.playPause();">Play/pause</button>
+<button onclick="sample.playPause();" disabled>Please wait, loading...</button>
 <input type="radio" name="ir" value="0" class="effect" checked>Telephone</input>
 <input type="radio" name="ir" value="1" class="effect">Muffler</input>
 <input type="radio" name="ir" value="2" class="effect">Spring feedback</input>

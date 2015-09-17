@@ -30,10 +30,15 @@ function VisualizerSample() {
   this.analyser.maxDecibels = 0;
   loadSounds(this, {
     buffer: 'chrono.mp3'
-    //buffer: 'sound.wav'
-  });
+  }, onLoaded);
   this.freqs = new Uint8Array(this.analyser.frequencyBinCount);
   this.times = new Uint8Array(this.analyser.frequencyBinCount);
+
+  function onLoaded() {
+    var button = document.querySelector('button');
+    button.removeAttribute('disabled');
+    button.innerHTML = 'Play/pause';
+  };
 
   this.isPlaying = false;
   this.startTime = 0;

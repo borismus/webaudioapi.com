@@ -18,7 +18,12 @@
 function VolumeSample() {
   loadSounds(this, {
     buffer: 'techno.wav'
-  });
+  }, onLoaded);
+  function onLoaded() {
+    var button = document.querySelector('button');
+    button.removeAttribute('disabled');
+    button.innerHTML = 'Play/pause';
+  };
   this.isPlaying = false;
 };
 

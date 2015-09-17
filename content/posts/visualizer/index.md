@@ -5,7 +5,7 @@ description: >
   Using the AnalyserNode and some Canvas 2D visualizations to show both
   time- and frequency- domain.
 
-<button style="display: block">Play/pause</button>
+<button style="display: block" disabled="true">Please wait, loading...</button>
 <canvas></canvas>
 
 <script src="/static/js/shared.js"></script>
