@@ -1,8 +1,8 @@
 Samples
 =======
-list:
+class: index
 filter: post
 type: archive
 limit: 100
 
-Hey
+Samples index (this will not be visible).

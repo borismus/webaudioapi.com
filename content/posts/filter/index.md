@@ -10,9 +10,9 @@ description: >
 <input type="checkbox" id="c1" checked="false" onchange="sample.toggleFilter(this);">
 <label for="c1"><span></span>Enable filter</label>
 
-<input type="range" min="0" max="1" step="0.01" value="1" onchange="sample.changeFrequency(this);"> Frequency
+<input type="range" min="0" max="1" step="0.01" value="1" oninput="sample.changeFrequency(this);"> Frequency
 
-<input type="range" min="0" max="1" step="0.01" value="0" onchange="sample.changeQuality(this);"> Quality
+<input type="range" min="0" max="1" step="0.01" value="0" oninput="sample.changeQuality(this);"> Quality
 
 <script src="/static/js/shared.js"></script>
 <script src="filter-sample.js"></script>

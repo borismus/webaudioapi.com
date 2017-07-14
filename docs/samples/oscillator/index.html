@@ -1,0 +1,90 @@
+<!doctype html>
+<head>
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+
+<title>Oscillator | Web Audio API</title>
+
+<link rel="stylesheet" href="/static/style.css" type="text/css" media="screen" />
+</head>
+
+<body>
+
+<div id="container">
+
+  <div id="nav">
+    <ul>
+      <li><a href="/samples">Samples</a>
+      </li>
+    </ul>
+  </div>
+
+  <div id="header">
+    <h1><a href="/">Web Audio API</a></h1>
+  </div>
+
+
+  <div id="wrapper">
+    <div id="content">
+
+      
+<div class="post">
+  <h2>Oscillator</h2>
+  <p>
+    Generating basic tones at various frequencies using the OscillatorNode.
+  </p>
+  <p>
+    <!-- Change between different Oscillator types. Also have a dragger
+     thing for frequency and detune, and visualize the result. -->
+
+<p><canvas style="background: white;"></canvas></p>
+
+<div>
+Frequency: <input id="frequency" type="range" min="0" max="1000"
+step="1" value="440"
+oninput="sample.changeFrequency(this.value);">
+Detune: <input id="detune" type="range" min="-100" max="100" step="5" value="0"
+oninput="sample.changeDetune(this.value);">
+</div>
+
+<div>
+<input type="radio" name="ir" value="0" class="effect" checked
+onclick="sample.changeType('sine')">Sine</input>
+<input type="radio" name="ir" value="1" class="effect"
+onclick="sample.changeType('square')">Square</input>
+<input type="radio" name="ir" value="2" class="effect"
+onclick="sample.changeType('sawtooth')">Sawtooth</input>
+<input type="radio" name="ir" value="3" class="effect"
+onclick="sample.changeType('triangle')">Triangle</input>
+</div>
+
+<p><button onclick="sample.toggle()">Play/pause</button></p>
+
+<script src="/static/js/shared.js"></script>
+<script src="oscillator-sample.js"></script>
+<script>
+var sample = new OscillatorSample();
+</script>
+
+  </p>
+</div>
+
+
+    </div>
+
+  </div>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-17930798-28']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+  </body>
+</html>

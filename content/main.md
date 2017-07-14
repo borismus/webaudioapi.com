@@ -1,10 +1,11 @@
 Welcome
 =======
 type: index
+class: home
 
 This site hosts Web Audio [samples][] which are referenced in my book "Web Audio
 API: Advanced Sound for Games and Interactive Apps". You can either [read this
-book for free][free] or, if you'd like to support the author, buy it from
+book for free][free] or, if you'd like a hard copy, buy it from
 [O'Reilly][orly] or [Amazon][amzn].
 
 [free]: http://chimera.labs.oreilly.com/books/1234000001552/pr01.html
@@ -12,22 +13,16 @@ book for free][free] or, if you'd like to support the author, buy it from
 [amzn]: http://www.amazon.com/Web-Audio-API-Boris-Smus/dp/1449332684
 [samples]: /samples
 
-## Links
+## Related links
 
 - [Web Audio API W3C specification](http://www.w3.org/TR/webaudio/)
-- [Web Audio Examples](http://chromium.googlecode.com/svn/trunk/samples/audio/index.html)
-- [Getting started with the Web Audio API](http://www.html5rocks.com/en/tutorials/webaudio/intro/)
-- [Developing game audio with the Web Audio API](http://www.html5rocks.com/en/tutorials/webaudio/games/)
-- [Scheduling Web Audio with precision](http://www.html5rocks.com/en/tutorials/audio/scheduling/)
-- [Web MIDI API W3C specification](http://webaudio.github.com/web-midi-api/)
-- [Web Audio playground](http://webaudioplayground.appspot.com/)
+- [Web MIDI API W3C specification](http://webaudio.github.io/web-midi-api/)
+- [Media Capture and Streams specification](https://w3c.github.io/mediacapture-main/getusermedia.html)
 
 ## Errors?
 
-If you'd like to change something about this site (eg. add a link to your blog
-post, fix a sample, tweak the design), or have some other idea, please submit a
-pull request to the [github repo][gh]. If you spot an error in the book, please
-[contact me][me].
+If you find an error on this page or in one of the samples, please [contact
+me][me] or better yet, [submit a github issue][gh]. 
 
 -- [Boris Smus][me]
 

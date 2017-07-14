@@ -1,0 +1,67 @@
+<!doctype html>
+<head>
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+
+<title>Crossfade | Web Audio API</title>
+
+<link rel="stylesheet" href="/static/style.css" type="text/css" media="screen" />
+</head>
+
+<body>
+
+<div id="container">
+
+  <div id="nav">
+    <ul>
+      <li><a href="/samples">Samples</a>
+      </li>
+    </ul>
+  </div>
+
+  <div id="header">
+    <h1><a href="/">Web Audio API</a></h1>
+  </div>
+
+
+  <div id="wrapper">
+    <div id="content">
+
+      
+<div class="post">
+  <h2>Crossfade</h2>
+  <p>
+    Equal-power crossfading to mix between two tracks.
+  </p>
+  <p>
+    <p><input type="button" onclick="sample.toggle();" value="Play/Pause">
+Drums <input type="range" min="0" max="100" value="100" oninput="sample.crossfade(this);"> Organ</p>
+
+<script src="/static/js/shared.js"></script>
+<script src="crossfade-sample.js"></script>
+<script>
+var sample = new CrossfadeSample();
+</script>
+
+  </p>
+</div>
+
+
+    </div>
+
+  </div>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-17930798-28']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+  </body>
+</html>

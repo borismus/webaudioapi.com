@@ -10,7 +10,7 @@ description: Lets you adjust gain and show when clipping happens.
 </style>
 
 <button click="sample.playPause()">Play/pause</button>
-Master gain: <input type="range" min="0" step="0.1" max="10" onchange="sample.gainRangeChanged(this)">
+Master gain: <input type="range" min="0" step="0.1" max="10" oninput="sample.gainRangeChanged(this)">
 Meter level: <span id="meter"></span>
 
 <script src="/static/js/shared.js"></script>

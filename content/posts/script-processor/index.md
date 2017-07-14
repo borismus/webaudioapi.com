@@ -2,7 +2,9 @@ Script Processor Node
 =====================
 posted: 2013-03-03
 description: >
-  A sample that shows the `ScriptProcessorNode` in action.
+  A sample that shows the ScriptProcessorNode in action.
+
+This example adds a bit of random noise using a `ScriptProcessorNode`.
 
 <button onclick="sample.toggle()">Play/Pause</button>
 

@@ -1,0 +1,71 @@
+<!doctype html>
+<head>
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+
+<title>Room Effects | Web Audio API</title>
+
+<link rel="stylesheet" href="/static/style.css" type="text/css" media="screen" />
+</head>
+
+<body>
+
+<div id="container">
+
+  <div id="nav">
+    <ul>
+      <li><a href="/samples">Samples</a>
+      </li>
+    </ul>
+  </div>
+
+  <div id="header">
+    <h1><a href="/">Web Audio API</a></h1>
+  </div>
+
+
+  <div id="wrapper">
+    <div id="content">
+
+      
+<div class="post">
+  <h2>Room Effects</h2>
+  <p>
+    Using ConvolverNode and impulse response samples to illustrate various kinds of room effects.
+
+  </p>
+  <p>
+    <p><button onclick="sample.playPause();" disabled>Please wait, loading...</button>
+<input type="radio" name="ir" value="0" class="effect" checked>Telephone</input>
+<input type="radio" name="ir" value="1" class="effect">Muffler</input>
+<input type="radio" name="ir" value="2" class="effect">Spring feedback</input>
+<input type="radio" name="ir" value="3" class="effect">Crazy echo</input></p>
+
+<script src="/static/js/shared.js"></script>
+<script src="room-effects-sample.js"></script>
+<script>
+var sample = new RoomEffectsSample(document.querySelectorAll('input.effect'));
+</script>
+
+  </p>
+</div>
+
+
+    </div>
+
+  </div>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-17930798-28']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+  </body>
+</html>

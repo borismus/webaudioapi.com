@@ -2,7 +2,7 @@ Room Effects
 ============
 posted: 2013-03-03
 description: >
-  Using `ConvolverNode` and impulse response samples to illustrate various
+  Using ConvolverNode and impulse response samples to illustrate various
   kinds of room effects.
 
 <button onclick="sample.playPause();" disabled>Please wait, loading...</button>

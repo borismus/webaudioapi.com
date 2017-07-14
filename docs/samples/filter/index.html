@@ -1,0 +1,74 @@
+<!doctype html>
+<head>
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+
+<title>Filter | Web Audio API</title>
+
+<link rel="stylesheet" href="/static/style.css" type="text/css" media="screen" />
+</head>
+
+<body>
+
+<div id="container">
+
+  <div id="nav">
+    <ul>
+      <li><a href="/samples">Samples</a>
+      </li>
+    </ul>
+  </div>
+
+  <div id="header">
+    <h1><a href="/">Web Audio API</a></h1>
+  </div>
+
+
+  <div id="wrapper">
+    <div id="content">
+
+      
+<div class="post">
+  <h2>Filter</h2>
+  <p>
+    Apply a simple low pass filter to a sound. Lets you tweak frequency and Q values.
+
+  </p>
+  <p>
+    <p><input type="button" onclick="sample.toggle();" value="Play/Pause"></p>
+
+<p><input type="checkbox" id="c1" checked="false" onchange="sample.toggleFilter(this);">
+<label for="c1"><span></span>Enable filter</label></p>
+
+<p><input type="range" min="0" max="1" step="0.01" value="1" oninput="sample.changeFrequency(this);"> Frequency</p>
+
+<p><input type="range" min="0" max="1" step="0.01" value="0" oninput="sample.changeQuality(this);"> Quality</p>
+
+<script src="/static/js/shared.js"></script>
+<script src="filter-sample.js"></script>
+<script>
+var sample = new FilterSample();
+</script>
+
+  </p>
+</div>
+
+
+    </div>
+
+  </div>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-17930798-28']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+  </body>
+</html>

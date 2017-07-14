@@ -1,7 +1,7 @@
 Microphone
 ========
 posted: 2013-03-03
-description: Integrating `getUserMedia` and the Web Audio API.
+description: Integrating getUserMedia and the Web Audio API.
 
 <canvas style="background: white;"></canvas>
 

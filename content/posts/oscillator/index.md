@@ -1,7 +1,7 @@
 Oscillator
 ==========
 posted: 2013-03-03
-description: Generating basic tones at various frequencies using the `OscillatorNode`.
+description: Generating basic tones at various frequencies using the OscillatorNode.
 
 <!-- Change between different Oscillator types. Also have a dragger
      thing for frequency and detune, and visualize the result. -->
@@ -11,9 +11,9 @@ description: Generating basic tones at various frequencies using the `Oscillator
 <div>
 Frequency: <input id="frequency" type="range" min="0" max="1000"
 step="1" value="440"
-onchange="sample.changeFrequency(this.value);">
+oninput="sample.changeFrequency(this.value);">
 Detune: <input id="detune" type="range" min="-100" max="100" step="5" value="0"
-onchange="sample.changeDetune(this.value);">
+oninput="sample.changeDetune(this.value);">
 </div>
 
 <div>
