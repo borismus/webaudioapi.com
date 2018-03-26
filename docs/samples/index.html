@@ -28,95 +28,6 @@
 
       
 
-<article onclick="window.location.href='/samples/audio-tag';">
-  <h1><a href="/samples/audio-tag">Audio Tag</a></h1>
-  <p>
-    Illustrates the use of MediaElementAudioSourceNode to wrap the audio tag.
-
-  </p>
-</article>
-
-<article onclick="window.location.href='/samples/crossfade';">
-  <h1><a href="/samples/crossfade">Crossfade</a></h1>
-  <p>
-    Equal-power crossfading to mix between two tracks.
-  </p>
-</article>
-
-<article onclick="window.location.href='/samples/crossfade-playlist';">
-  <h1><a href="/samples/crossfade-playlist">Crossfading Playlist</a></h1>
-  <p>
-    Automatic crossfading between songs (as in a playlist).
-  </p>
-</article>
-
-<article onclick="window.location.href='/samples/filter';">
-  <h1><a href="/samples/filter">Filter</a></h1>
-  <p>
-    Apply a simple low pass filter to a sound. Lets you tweak frequency and Q values.
-
-  </p>
-</article>
-
-<article onclick="window.location.href='/samples/frequency-response';">
-  <h1><a href="/samples/frequency-response">Frequency Response</a></h1>
-  <p>
-    A sample showing the frequency response graphs of various kinds of BiquadFilterNodes.
-  </p>
-</article>
-
-<article onclick="window.location.href='/samples/metering';">
-  <h1><a href="/samples/metering">Metering</a></h1>
-  <p>
-    Lets you adjust gain and show when clipping happens.
-  </p>
-</article>
-
-<article onclick="window.location.href='/samples/microphone';">
-  <h1><a href="/samples/microphone">Microphone</a></h1>
-  <p>
-    Integrating getUserMedia and the Web Audio API.
-  </p>
-</article>
-
-<article onclick="window.location.href='/samples/oscillator';">
-  <h1><a href="/samples/oscillator">Oscillator</a></h1>
-  <p>
-    Generating basic tones at various frequencies using the OscillatorNode.
-  </p>
-</article>
-
-<article onclick="window.location.href='/samples/procedural';">
-  <h1><a href="/samples/procedural">Procedural sound</a></h1>
-  <p>
-    Procedurally generated gunshot sounds.
-  </p>
-</article>
-
-<article onclick="window.location.href='/samples/rapid-sounds';">
-  <h1><a href="/samples/rapid-sounds">Rapidly played sounds</a></h1>
-  <p>
-    Many sound effects playing nearly simultaneously. Illustrates pitch and temporal randomness.
-
-  </p>
-</article>
-
-<article onclick="window.location.href='/samples/rhythm';">
-  <h1><a href="/samples/rhythm">Drumkit Rhythm</a></h1>
-  <p>
-    Illustrating the API's precise timing model by playing back a simple rhythm.
-
-  </p>
-</article>
-
-<article onclick="window.location.href='/samples/room-effects';">
-  <h1><a href="/samples/room-effects">Room Effects</a></h1>
-  <p>
-    Using ConvolverNode and impulse response samples to illustrate various kinds of room effects.
-
-  </p>
-</article>
-
 <article onclick="window.location.href='/samples/script-processor';">
   <h1><a href="/samples/script-processor">Script Processor Node</a></h1>
   <p>
@@ -133,11 +44,100 @@
   </p>
 </article>
 
+<article onclick="window.location.href='/samples/microphone';">
+  <h1><a href="/samples/microphone">Microphone</a></h1>
+  <p>
+    Integrating getUserMedia and the Web Audio API.
+  </p>
+</article>
+
+<article onclick="window.location.href='/samples/room-effects';">
+  <h1><a href="/samples/room-effects">Room Effects</a></h1>
+  <p>
+    Using ConvolverNode and impulse response samples to illustrate various kinds of room effects.
+
+  </p>
+</article>
+
+<article onclick="window.location.href='/samples/crossfade-playlist';">
+  <h1><a href="/samples/crossfade-playlist">Crossfading Playlist</a></h1>
+  <p>
+    Automatic crossfading between songs (as in a playlist).
+  </p>
+</article>
+
+<article onclick="window.location.href='/samples/frequency-response';">
+  <h1><a href="/samples/frequency-response">Frequency Response</a></h1>
+  <p>
+    A sample showing the frequency response graphs of various kinds of BiquadFilterNodes.
+  </p>
+</article>
+
+<article onclick="window.location.href='/samples/crossfade';">
+  <h1><a href="/samples/crossfade">Crossfade</a></h1>
+  <p>
+    Equal-power crossfading to mix between two tracks.
+  </p>
+</article>
+
+<article onclick="window.location.href='/samples/oscillator';">
+  <h1><a href="/samples/oscillator">Oscillator</a></h1>
+  <p>
+    Generating basic tones at various frequencies using the OscillatorNode.
+  </p>
+</article>
+
+<article onclick="window.location.href='/samples/rhythm';">
+  <h1><a href="/samples/rhythm">Drumkit Rhythm</a></h1>
+  <p>
+    Illustrating the API's precise timing model by playing back a simple rhythm.
+
+  </p>
+</article>
+
+<article onclick="window.location.href='/samples/metering';">
+  <h1><a href="/samples/metering">Metering</a></h1>
+  <p>
+    Lets you adjust gain and show when clipping happens.
+  </p>
+</article>
+
+<article onclick="window.location.href='/samples/audio-tag';">
+  <h1><a href="/samples/audio-tag">Audio Tag</a></h1>
+  <p>
+    Illustrates the use of MediaElementAudioSourceNode to wrap the audio tag.
+
+  </p>
+</article>
+
+<article onclick="window.location.href='/samples/filter';">
+  <h1><a href="/samples/filter">Filter</a></h1>
+  <p>
+    Apply a simple low pass filter to a sound. Lets you tweak frequency and Q values.
+
+  </p>
+</article>
+
 <article onclick="window.location.href='/samples/value-curve';">
   <h1><a href="/samples/value-curve">Tremolo with timing curves and oscillators</a></h1>
   <p>
     Sets a sinusoidal value timing curve for a tremolo effect. Also does the same thing with an oscillator-based LFO.
 
+  </p>
+</article>
+
+<article onclick="window.location.href='/samples/volume';">
+  <h1><a href="/samples/volume">Volume Control</a></h1>
+  <p>
+    A very simple example that lets you change the volume using a GainNode.
+
+  </p>
+</article>
+
+<article onclick="window.location.href='/samples/procedural';">
+  <h1><a href="/samples/procedural">Procedural sound</a></h1>
+  <p>
+    Procedurally generated gunshot sounds.
   </p>
 </article>
 
@@ -149,10 +149,10 @@
   </p>
 </article>
 
-<article onclick="window.location.href='/samples/volume';">
-  <h1><a href="/samples/volume">Volume Control</a></h1>
+<article onclick="window.location.href='/samples/rapid-sounds';">
+  <h1><a href="/samples/rapid-sounds">Rapidly played sounds</a></h1>
   <p>
-    A very simple example that lets you change the volume using a GainNode.
+    Many sound effects playing nearly simultaneously. Illustrates pitch and temporal randomness.
 
   </p>
 </article>
