@@ -31,8 +31,7 @@ MicrophoneSample.prototype.getMicrophoneInput = function() {
   var isLocalhost = window.location.hostname == 'localhost' ||
       window.location.hostname == '127.0.0.1';
   if (window.location.protocol != 'https:' && !isLocalhost) {
-    console.error('getUserMedia requires HTTPS. Redirecting.');
-    window.location.href = 'https://borismus.github.io/webaudioapi.com/samples/microphone';
+    alert('HTTPS is required for microphone access, and this site has no SSL cert yet. Sorry!');
   }
   navigator.getUserMedia({audio: true},
                           this.onStream.bind(this),

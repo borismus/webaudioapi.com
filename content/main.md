@@ -5,13 +5,14 @@ class: home
 
 This site hosts Web Audio [samples][] which are referenced in my book "Web Audio
 API: Advanced Sound for Games and Interactive Apps". You can either [read this
-book for free][free] or, if you'd like a hard copy, buy it from
+book for free][free] ([cc license][cc]) or, if you'd like a hard copy, buy it from
 [O'Reilly][orly] or [Amazon][amzn].
 
-[free]: http://chimera.labs.oreilly.com/books/1234000001552/pr01.html
+[free]: /book/Web_Audio_API_Boris_Smus.pdf
 [orly]: http://shop.oreilly.com/product/0636920025948.do
 [amzn]: http://www.amazon.com/Web-Audio-API-Boris-Smus/dp/1449332684
 [samples]: /samples
+[cc]: https://creativecommons.org/licenses/by-nd/3.0/
 
 ## Related links
 
