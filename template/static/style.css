@@ -89,3 +89,7 @@ input[type="checkbox"] + label span {
 input[type="checkbox"]:checked + label span {
   background:url(/static/images/check_radio_sheet.png) -19px top no-repeat;
 }
+
+blockquote {
+  font-style: italic;
+}
