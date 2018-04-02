@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Web Audio API</title>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"> </script>
+    <link rel="stylesheet" type="text/css" href="theme/html/html.css">
+  </head>
+  <body data-type="book">
+    <section xmlns="http://www.w3.org/1999/xhtml" id="ch01" class="pagenumrestart" data-type="chapter"><h1>Fundamentals</h1><p>This chapter will describe how to get started with the Web Audio API,
+  which browsers are supported, how to detect if the API is available, what an
+  audio graph is, what audio nodes are, how to connect nodes together, some
+  basic node types, and finally, how to load sound files and playback
+  sounds.</p><section id="s00_1" data-type="sect1"><h1>A Brief History of Audio on the Web</h1><p>The first way of playing back sounds on the web was via the <code>&lt;bgsound&gt;</code> tag, which let website authors
+    automatically play background music when a visitor opened their pages.
+    This feature was only available in Internet Explorer, and was never
+    standardized or picked up by other browsers. Netscape implemented a
+    similar feature with the <span class="keep-together"><code>&lt;embed&gt;</code></span> tag, providing basically
+    equivalent functionality.</p><p>Flash was the first cross-browser way of playing back audio on the
+    Web, but it had the significant drawback of requiring a plug-in to run.
+    More recently, browser vendors have rallied around the HTML5 <code>&lt;audio&gt;</code> element, which provides native
+    support for audio playback in all modern browsers.</p><p>Although audio on the Web no longer requires a plug-in, the <code>&lt;audio&gt;</code> tag has significant limitations
+    for implementing sophisticated games and interactive applications. The
+    following are just some of the limitations of the <code>&lt;audio&gt;</code> element:</p><ul><li><p>No precise timing controls</p></li><li><p>Very low limit for the number of sounds played at once</p></li><li><p>No way to reliably pre-buffer a sound</p></li><li><p>No ability to apply real-time effects</p></li><li><p>No way to analyze sounds</p></li></ul><p>There have been several attempts to create a powerful audio API on
+    the Web to address some of the limitations I previously described. One
+    notable example is the Audio Data API that was designed and prototyped in
+    Mozilla Firefox. Mozilla’s approach started with an <code>&lt;audio&gt;</code> element and extended its
+    JavaScript API with additional features. This API has a limited audio
+    graph (more on this later in <a href="#s01_1" data-type="xref">The Audio Context</a>), and hasn’t been
+    adopted beyond its first implementation. It is currently deprecated in
+    Firefox in favor of the Web Audio API.</p><p>In contrast with the Audio Data API, the Web Audio API is a brand
+    new model, completely separate from the <code>&lt;audio&gt;</code> tag, although there are
+    integration points with other web APIs (see <a href="ch07.html#ch07" data-type="xref">Integrating with Other Technologies</a>). It
+    is a high-level JavaScript API for processing and synthesizing audio in
+    web applications. The goal of this API is to include capabilities found in
+    modern game engines and some of the mixing, processing, and filtering
+    tasks that are found in modern desktop audio production applications. The
+    result is a versatile API that can be used in a variety of audio-related
+    tasks, from games, to interactive applications, to very advanced music
+    synthesis applications and visualizations.</p></section><section id="s00_2" data-type="sect1"><h1>Games and Interactivity</h1><p>Audio is a huge part of what makes interactive experiences so
+    compelling. If you don’t believe me, try watching a movie with the volume
+    muted.</p><p>Games are no exception! My fondest video game memories are of the
+    music and sound effects. Now, nearly two decades after the release of some
+    of my favorites, I still can’t get Koji Kondo’s <em>Zelda</em>
+    and Matt Uelmen’s <em>Diablo</em> soundtracks out of my head.
+    Even the sound effects from these masterfully-designed games are instantly
+    recognizable, from the unit click responses in Blizzard’s
+    <em>Warcraft</em> and <em>Starcraft</em> series to
+    samples from Nintendo’s classics.</p><p>Sound effects matter a great deal outside of games, too. They have
+    been around in user interfaces (UIs) since the days of the command line,
+    where certain kinds of errors would result in an audible beep. The same
+    idea continues through modern UIs, where well-placed sounds are critical
+    for notifications, chimes, and of course audio and video communication
+    applications like Skype. Assistant software such as Google Now and Siri
+    provide rich, audio-based feedback. As we delve further into a world of
+    ubiquitous computing, speech- and gesture-based interfaces that lend
+    themselves to screen-free interactions are increasingly reliant on audio
+    feedback. Finally, for visually impaired computer users, audio cues,
+    speech synthesis, and speech recognition are critically important to
+    create a usable experience.</p><p>Interactive audio presents some interesting challenges. To create
+    convincing in-game music, designers need to adjust to all the potentially
+    unpredictable game states a player can find herself in. In practice,
+    sections of the game can go on for an unknown duration, and sounds can
+    interact with the environment and mix in complex ways, requiring
+    environment-specific effects and relative sound positioning. Finally,
+    there can be a large number of sounds playing at once, all of which need
+    to sound good together and render without introducing quality and
+    performance penalties.</p></section><section id="s01_1" data-type="sect1"><h1>The Audio Context</h1><p>The Web Audio API is built around the concept of an audio context.
+    The audio context is a directed graph of audio nodes that defines how the
+    audio stream flows from its source (often an audio file) to its
+    destination (often your speakers). As audio passes through each node, its
+    properties can be modified or inspected. The simplest audio context is a
+    connection directly form a source node to a destination node (<a href="#fig1" data-type="xref">Figure 1-1</a>).</p><figure id="fig1" style="float: 0"><img src="images/waap_0101.png"><figcaption><span class="label">Figure 1-1. </span>The simplest audio context</figcaption></figure><p>An audio context can be complex, containing many nodes between the
+    source and destination (<a href="#fig2" data-type="xref">Figure 1-2</a>) to perform arbitrarily
+    advanced synthesis or analysis.</p><p>Figures <a href="#fig1" data-type="xref" data-xrefstyle="select: labelnumber">Figure 1-1</a> and
+    <a href="#fig2" data-type="xref" data-xrefstyle="select: labelnumber">Figure 1-2</a> show audio nodes
+    as blocks. The arrows represent connections between nodes. Nodes can often
+    have multiple incoming and outgoing connections. By default, if there are
+    multiple incoming connections into a node, the Web Audio API simply blends
+    the incoming audio signals together.</p><p>The concept of an audio node graph is not new, and derives from
+    popular audio frameworks such as Apple’s CoreAudio, which has an analogous
+    <a href="http://bit.ly/15tPRNM">Audio Processing Graph API</a>. The
+    idea itself is even older, originating in the 1960s with early audio
+    environments like <a href="http://en.wikipedia.org/wiki/Moog_synthesizer">Moog modular
+    synthesizer systems</a>.</p><figure id="fig2" style="float: 0"><img src="images/waap_0102.png"><figcaption><span class="label">Figure 1-2. </span>A more complex audio context</figcaption></figure></section><section id="s01_2" data-type="sect1"><h1>Initializing an Audio Context</h1><p>The Web Audio API is currently implemented by the Chrome and Safari
+    browsers (including <span class="keep-together">Mobile</span>Safari as
+    of iOS 6) and is available for web developers via JavaScript. In these
+    browsers, the audio context constructor is webkit-prefixed, meaning that
+    instead of creating a new <code>AudioContext</code>,
+    you create a new <code>webkitAudioContext</code>.
+    However, this will surely change in the future as the API stabilizes
+    enough to ship un-prefixed and as other browser vendors implement it.
+    Mozilla has <a href="https://wiki.mozilla.org/Web_Audio_API">publicly
+    stated</a> that they are implementing the Web Audio API in Firefox,
+    and Opera has <a href="http://lists.w3.org/Archives/Public/public-audio/2012AprJun/0279.html">started
+    participating</a> in the working group.</p><p>With this in mind, here is a liberal way of initializing your audio
+    context that would include other implementations (once they exist):</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">var</code> <code class="nx">contextClass</code> <code class="o">=</code> <code class="p">(</code><code class="nb">window</code><code class="p">.</code><code class="nx">AudioContext</code> <code class="o">||</code> 
+  <code class="nb">window</code><code class="p">.</code><code class="nx">webkitAudioContext</code> <code class="o">||</code> 
+  <code class="nb">window</code><code class="p">.</code><code class="nx">mozAudioContext</code> <code class="o">||</code> 
+  <code class="nb">window</code><code class="p">.</code><code class="nx">oAudioContext</code> <code class="o">||</code> 
+  <code class="nb">window</code><code class="p">.</code><code class="nx">msAudioContext</code><code class="p">);</code>
+<code class="k">if</code> <code class="p">(</code><code class="nx">contextClass</code><code class="p">)</code> <code class="p">{</code>
+  <code class="c1">// Web Audio API is available.</code>
+  <code class="kd">var</code> <code class="nx">context</code> <code class="o">=</code> <code class="k">new</code> <code class="nx">contextClass</code><code class="p">();</code>
+<code class="p">}</code> <code class="k">else</code> <code class="p">{</code>
+  <code class="c1">// Web Audio API is not available. Ask the user to use a supported browser.</code>
+<code class="p">}</code></pre><p>A single audio context can support multiple sound inputs and complex
+    audio graphs, so generally speaking, we will only need one for each audio
+    application we create. The audio context instance includes many methods
+    for creating audio nodes and manipulating global audio preferences.
+    Luckily, these methods are not webkit-prefixed and are relatively stable.
+    The API is still changing, though, so be aware of breaking changes (see
+    <a href="appa.html#app01" data-type="xref">Deprecation Notes</a>).</p></section><section id="s01_3" data-type="sect1"><h1>Types of Web Audio Nodes</h1><p>One of the main uses of audio contexts is to create new audio nodes.
+    Broadly speaking, there are several kinds of audio nodes:</p><dl><dt>Source nodes</dt><dd><p>Sound sources such as audio buffers, live audio inputs,
+          <code>&lt;audio&gt;</code> tags, oscillators,
+          and JS processors</p></dd><dt>Modification nodes</dt><dd><p>Filters, convolvers, panners, JS processors, etc.</p></dd><dt>Analysis nodes</dt><dd><p>Analyzers and JS processors</p></dd><dt>Destination nodes</dt><dd><p>Audio outputs and offline processing buffers</p></dd></dl><p>Sources need not be based on sound files, but can instead be
+    real-time input from a live instrument or microphone, redirection of the
+    audio output from an audio element [see <a href="ch07.html#s07_1" data-type="xref">Setting Up Background Music with the &lt;audio&gt; Tag</a>], or
+    entirely synthesized sound [see <a href="ch06.html#s06_6" data-type="xref">Audio Processing with JavaScript</a>]. Though the
+    final destination-node is often the speakers, you can also process without
+    sound playback (for example, if you want to do pure visualization) or do
+    offline processing, which results in the audio stream being written to a
+    destination buffer for later use.</p></section><section id="s01_4" data-type="sect1"><h1>Connecting the Audio Graph</h1><p>Any audio node’s output can be connected to any other audio node’s
+    input by using the <code>connect()</code> function.
+    In the following example, we connect a source node’s output into a gain
+    node, and connect the gain node’s output into the context’s
+    destination:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="c1">// Create the source.</code>
+<code class="kd">var</code> <code class="nx">source</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createBufferSource</code><code class="p">();</code>
+<code class="c1">// Create the gain node.</code>
+<code class="kd">var</code> <code class="nx">gain</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createGain</code><code class="p">();</code>
+<code class="c1">// Connect source to filter, filter to destination.</code>
+<code class="nx">source</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">gain</code><code class="p">);</code>
+<code class="nx">gain</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">context</code><code class="p">.</code><code class="nx">destination</code><code class="p">);</code></pre><p>Note that <code>context.destination</code> is a special node that is
+    associated with the default audio output of your system. The resulting
+    audio graph of the previous code looks like <a href="#fig3" data-type="xref">Figure 1-3</a>.</p><figure id="fig3" style="float: 0"><img src="images/waap_0103.png"><figcaption><span class="label">Figure 1-3. </span>Our first audio graph</figcaption></figure><p>Once we have connected up a graph like this we can dynamically
+    change it. We can disconnect audio nodes from the graph by calling
+    <code>node.disconnect(outputNumber)</code>. For example, to reroute a
+    direct connection between source and destination, circumventing the
+    intermediate node, we can do the following:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="nx">source</code><code class="p">.</code><code class="nx">disconnect</code><code class="p">(</code><code class="mi">0</code><code class="p">);</code>
+<code class="nx">gain</code><code class="p">.</code><code class="nx">disconnect</code><code class="p">(</code><code class="mi">0</code><code class="p">);</code>
+<code class="nx">source</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">context</code><code class="p">.</code><code class="nx">destination</code><code class="p">);</code></pre></section><section id="s01_5" data-type="sect1"><h1>Power of Modular Routing</h1><p>In many games, multiple sources of sound are combined to create the
+    final mix. Sources include background music, game sound effects, UI
+    feedback sounds, and in a multiplayer setting, voice chat from other
+    players. An important feature of the Web Audio API is that it lets you
+    separate all of these different channels and gives you full control over
+    each one, or all of them together. The audio graph for such a setup might
+    look like <a href="#fig4" data-type="xref">Figure 1-4</a>.</p><figure id="fig4" style="float: 0"><img src="images/waap_0104.png"><figcaption><span class="label">Figure 1-4. </span>Multiple sources with individual gain control as well as a master
+      gain</figcaption></figure><p>We have associated a separate gain node with each of the channels
+    and also created a master gain node to control them all. With this setup,
+    it is easy for your players to control the level of each channel
+    separately, precisely the way they want to. For example, many people
+    prefer to play games with the background music turned off.</p><aside id="s01_6" class="theory" data-type="sidebar"><h5>What Is Sound?</h5><p>In terms of physics, sound is a longitudinal wave (sometimes
+      called a pressure wave) that travels through air or another medium. The
+      source of the sound causes molecules in the air to vibrate and collide
+      with one another. This causes regions of high and low pressure, which
+      come together and fall apart in bands. If you could freeze time and look
+      at the pattern of a sound wave, you might see something like <a href="#fig5" data-type="xref">Figure 1-5</a>.</p><figure id="fig5" style="float: 0"><img src="images/waap_0105.png"><figcaption><span class="label">Figure 1-5. </span>A sound pressure wave traveling through air particles</figcaption></figure><p>Mathematically, sound can be represented as a function, which
+      ranges over pressure values across the domain of time. <a href="#fig6" data-type="xref">Figure 1-6</a> shows a graph of such a function. You can see that it
+      is analogous to <a href="#fig5" data-type="xref">Figure 1-5</a>, with high values corresponding
+      to areas with dense particles (high pressure), and low values
+      corresponding to areas with sparse particles (low pressure).</p><figure id="fig6" style="float: 0"><img src="images/waap_0106.png"><figcaption><span class="label">Figure 1-6. </span>A mathematical representation of the sound wave in <a href="#fig5" data-type="xref">Figure 1-5</a></figcaption></figure><p>Electronics dating back to the early twentieth century made it
+      possible for us to capture and recreate sounds for the first time.
+      Microphones take the pressure wave and convert it into an electric
+      signal, where (for example) +5 volts corresponds to the highest pressure
+      and −5 volts to the lowest. Conversely, audio speakers take this voltage
+      and convert it back into the pressure waves that we can hear.</p><p>Whether we are analyzing sound or synthesizing it, the interesting
+      bits for audio programmers are in the black box in <a href="#fig7" data-type="xref">Figure 1-7</a>, tasked with manipulating the audio signal. In the
+      early days of audio, this space was occupied by analog filters and other
+      hardware that would be considered archaic by today’s standards. Today,
+      there are modern digital equivalents for many of those old analog pieces
+      of equipment. But before we can use software to tackle the fun stuff, we
+      need to represent sound in a way that computers can work with.</p><figure id="fig7" style="float: 0"><img src="images/waap_0107.png"><figcaption><span class="label">Figure 1-7. </span>Recording and playback</figcaption></figure></aside><aside class="theory" data-type="sidebar" id="what-is-digital-sound-Jgu2S9Cr"><h5>What Is Digital Sound?</h5><p>We can do this by time-sampling the analog signal at some
+      frequency, and encoding the signal at each sample as a number. The rate
+      at which we sample the analog signal is called the <em>sample
+      rate</em>. A common sample rate in many sound applications is 44.1
+      kHz. This means that there are 44,100 numbers recorded for each second
+      of sound. The numbers themselves must fall within some range. There is
+      generally a certain number of bits allocated to each value, which is
+      called the <em>bit depth</em>. For most recorded digital
+      audio, including CDs, the bit depth is 16, which is generally enough for
+      most listeners. Audiophiles prefer 24-bit depth, which gives enough
+      precision that people’s ears can’t hear the difference compared to a
+      higher depth.</p><p>The process of converting analog signals into digital ones is
+      called <em>quantization</em> (or sampling) and is
+      illustrated in <a href="#fig8" data-type="xref">Figure 1-8</a>.</p><figure id="fig8" style="float: 0"><img src="images/waap_0108.png"><figcaption><span class="label">Figure 1-8. </span>Analog sound being quantized, or transformed into digital
+        sound</figcaption></figure><p>In <a href="#fig8" data-type="xref">Figure 1-8</a>, the quantized digital version isn’t
+      quite the same as the analog one because of differences between the bars
+      and the smooth line. The difference (shown in blue) decreases with
+      higher sample rates and bit depths. However, increasing these values
+      also increases the amount of storage required to keep these sounds in
+      memory, on disk, or on the Web. To save space, telephone systems often
+      used sample rates as low as 8 kHz, since the range of frequencies needed
+      to make the human voice intelligible is far smaller than our full
+      audible-frequency range.</p><p>By digitizing sound, computers can treat sounds like long arrays
+      of numbers. This sort of encoding is called <em>pulse-code
+      modulation (PCM)</em>. Because computers are so good at processing
+      arrays, PCM turns out to be a very powerful primitive for most
+      digital-audio applications. In the Web Audio API world, this long array
+      of numbers representing a sound is abstracted as an
+      <code>AudioBuffer</code>. <code>AudioBuffer</code>s can
+      store multiple audio channels (often in stereo, meaning a left and right
+      channel) represented as arrays of floating-point numbers normalized
+      between −1 and 1. The same signal can also be represented as an array of
+      integers, which, in 16-bit, range from (−2<sup>15</sup>)
+      to (2<sup>15</sup> − 1).</p></aside><aside id="s01_7" class="theory" data-type="sidebar"><h5>Audio Encoding Formats</h5><p>Raw audio in PCM format is quite large, which uses extra memory,
+      wastes space on a hard drive, and takes up extra bandwidth when
+      downloaded. Because of this, audio is generally stored in compressed
+      formats. There are two kinds of compression: lossy and lossless.
+      Lossless compression (e.g., FLAC) guarantees that when you compress and
+      then uncompress a sound, the bits are identical. Lossy audio compression
+      (e.g., MP3) exploits features of human hearing to save additional space
+      by throwing out bits that we probably won’t be able to hear anyway.
+      Lossy formats are generally good enough for most people, with the
+      exception of some audiophiles.</p><p>A commonly used metric for the amount of compression in audio is
+      called <em>bit rate</em>, which refers to the number of bits
+      of audio required per second of playback. The higher the bit rate, the
+      more data that can be allocated per unit of time, and thus the less
+      compression required. Often, lossy formats, such as MP3, are described
+      by their bit rate (common rates are 128 and 192 Kb/s). It’s possible to
+      encode lossy codecs at arbitrary bit rates. For example,
+      telephone-quality human speech is often compared to 8 Kb/s MP3s. Some
+      formats such as OGG support variable bit rates, where the bit rate
+      changes over time. Be careful not to confuse this concept with sample
+      rate or bit depth [see <a href="#s01_6" data-type="xref">What Is Sound?</a>]!</p><p>Browser support for different audio formats varies quite a bit.
+      Generally, if the Web Audio API is implemented in a browser, it uses the
+      same loading code that the <code>&lt;audio&gt;</code> tag would, so the browser
+      support matrix for <code>&lt;audio&gt;</code> and
+      the Web Audio API is the same. Generally, WAV (which is a simple,
+      lossless, and typically uncompressed format) is supported in all
+      browsers. MP3 is still patent-encumbered, and is therefore not available
+      in some purely open source browsers (e.g., Firefox and Chromium).
+      Unfortunately, the less popular but patent-unencumbered OGG format is
+      still not available in Safari at the time of this writing.</p><p>For a more up-to-date roster of audio format support, see <a href="http://mzl.la/13kGelS"><em class="hyperlink">http://mzl.la/13kGelS</em></a>.</p></aside></section><section id="s01_8" data-type="sect1"><h1>Loading and Playing Sounds</h1><p>Web Audio API makes a clear distinction between buffers and source
+    nodes. The idea of this architecture is to decouple the audio asset from
+    the playback state. Taking a record player analogy, buffers are like
+    records and sources are like playheads, except in the Web Audio API world,
+    you can play the same record on any number of playheads simultaneously!
+    Because many applications involve multiple versions of the same buffer
+    playing simultaneously, this pattern is essential. For example, if you
+    want multiple bouncing ball sounds to fire in quick succession, you need
+    to load the bounce buffer only once and schedule multiple sources of
+    playback [see <a href="ch04.html#s04_3" data-type="xref">Multiple Sounds with Variations</a>].</p><p>To load an audio sample into the Web Audio API, we can use an
+    <code>XMLHttpRequest</code> and process the results with
+    <code>context.decodeAudioData</code>. This all happens asynchronously and
+    doesn’t block the main UI thread:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">var</code> <code class="nx">request</code> <code class="o">=</code> <code class="k">new</code> <code class="nx">XMLHttpRequest</code><code class="p">();</code>
+<code class="nx">request</code><code class="p">.</code><code class="nx">open</code><code class="p">(</code><code class="s1">'GET'</code><code class="p">,</code> <code class="nx">url</code><code class="p">,</code> <code class="kc">true</code><code class="p">);</code>
+<code class="nx">request</code><code class="p">.</code><code class="nx">responseType</code> <code class="o">=</code> <code class="s1">'arraybuffer'</code><code class="p">;</code>
+
+<code class="c1">// Decode asynchronously</code>
+<code class="nx">request</code><code class="p">.</code><code class="nx">onload</code> <code class="o">=</code> <code class="kd">function</code><code class="p">()</code> <code class="p">{</code>
+  <code class="nx">context</code><code class="p">.</code><code class="nx">decodeAudioData</code><code class="p">(</code><code class="nx">request</code><code class="p">.</code><code class="nx">response</code><code class="p">,</code> <code class="kd">function</code><code class="p">(</code><code class="nx">theBuffer</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nx">buffer</code> <code class="o">=</code> <code class="nx">theBuffer</code><code class="p">;</code>
+  <code class="p">},</code> <code class="nx">onError</code><code class="p">);</code>
+<code class="p">}</code>
+<code class="nx">request</code><code class="p">.</code><code class="nx">send</code><code class="p">();</code></pre><p>Audio buffers are only one possible source of playback. Other
+    sources include direct input from a microphone or line-in device or an
+    <code>&lt;audio&gt;</code> tag among others (see
+    <a href="ch07.html#ch07" data-type="xref">Integrating with Other Technologies</a>).</p><p>Once you’ve loaded your buffer, you can create a source node
+    (<code>AudioBufferSourceNode</code>) for it, connect the source node into
+    your audio graph, and call <code>start(0)</code> on the source node. To
+    stop a sound, call <code>stop(0)</code> on the source node. Note that both
+    of these function calls require a time in the coordinate system of the
+    current audio context (see <a href="ch02.html#ch02" data-type="xref">Perfect Timing and Latency</a>):</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">function</code> <code class="nx">playSound</code><code class="p">(</code><code class="nx">buffer</code><code class="p">)</code> <code class="p">{</code>
+  <code class="kd">var</code> <code class="nx">source</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createBufferSource</code><code class="p">();</code>
+  <code class="nx">source</code><code class="p">.</code><code class="nx">buffer</code> <code class="o">=</code> <code class="nx">buffer</code><code class="p">;</code>
+  <code class="nx">source</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">context</code><code class="p">.</code><code class="nx">destination</code><code class="p">);</code>
+  <code class="nx">source</code><code class="p">.</code><code class="nx">start</code><code class="p">(</code><code class="mi">0</code><code class="p">);</code>
+<code class="p">}</code></pre><p>Games often have background music playing in a loop. However, be
+    careful about being overly repetitive with your selection: if a player is
+    stuck in an area or level, and the same sample continuously plays in the
+    background, it may be worthwhile to gradually fade out the track to
+    prevent frustration. Another strategy is to have mixes of various
+    intensity that gradually crossfade into one another depending on the game
+    situation [see <a href="ch02.html#s02_5" data-type="xref">Gradually Varying Audio Parameters</a>].</p></section><section id="s01_9" data-type="sect1"><h1>Putting It All Together</h1><p>As you can see from the previous code listings, there’s a bit of
+    setup to get sounds playing in the Web Audio API. For a real game,
+    consider implementing a JavaScript abstraction around the Web Audio API.
+    An example of this idea is the following <code>BufferLoader</code>
+    class. It puts everything together into a simple loader, which, given a
+    set of paths, returns a set of audio buffers. Here’s how such a class can
+    be used:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="nb">window</code><code class="p">.</code><code class="nx">onload</code> <code class="o">=</code> <code class="nx">init</code><code class="p">;</code>
+<code class="kd">var</code> <code class="nx">context</code><code class="p">;</code>
+<code class="kd">var</code> <code class="nx">bufferLoader</code><code class="p">;</code>
+
+<code class="kd">function</code> <code class="nx">init</code><code class="p">()</code> <code class="p">{</code>
+  <code class="nx">context</code> <code class="o">=</code> <code class="k">new</code> <code class="nx">webkitAudioContext</code><code class="p">();</code>
+
+  <code class="nx">bufferLoader</code> <code class="o">=</code> <code class="k">new</code> <code class="nx">BufferLoader</code><code class="p">(</code>
+    <code class="nx">context</code><code class="p">,</code>
+    <code class="p">[</code>
+      <code class="s1">'../sounds/hyper-reality/br-jam-loop.wav'</code><code class="p">,</code>
+      <code class="s1">'../sounds/hyper-reality/laughter.wav'</code><code class="p">,</code>
+    <code class="p">],</code>
+    <code class="nx">finishedLoading</code>
+    <code class="p">);</code>
+
+  <code class="nx">bufferLoader</code><code class="p">.</code><code class="nx">load</code><code class="p">();</code>
+<code class="p">}</code>
+
+<code class="kd">function</code> <code class="nx">finishedLoading</code><code class="p">(</code><code class="nx">bufferList</code><code class="p">)</code> <code class="p">{</code>
+  <code class="c1">// Create two sources and play them both together.</code>
+  <code class="kd">var</code> <code class="nx">source1</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createBufferSource</code><code class="p">();</code>
+  <code class="kd">var</code> <code class="nx">source2</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createBufferSource</code><code class="p">();</code>
+  <code class="nx">source1</code><code class="p">.</code><code class="nx">buffer</code> <code class="o">=</code> <code class="nx">bufferList</code><code class="p">[</code><code class="mi">0</code><code class="p">];</code>
+  <code class="nx">source2</code><code class="p">.</code><code class="nx">buffer</code> <code class="o">=</code> <code class="nx">bufferList</code><code class="p">[</code><code class="mi">1</code><code class="p">];</code>
+
+  <code class="nx">source1</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">context</code><code class="p">.</code><code class="nx">destination</code><code class="p">);</code>
+  <code class="nx">source2</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">context</code><code class="p">.</code><code class="nx">destination</code><code class="p">);</code>
+  <code class="nx">source1</code><code class="p">.</code><code class="nx">start</code><code class="p">(</code><code class="mi">0</code><code class="p">);</code>
+  <code class="nx">source2</code><code class="p">.</code><code class="nx">start</code><code class="p">(</code><code class="mi">0</code><code class="p">);</code>
+<code class="p">}</code></pre><p>For a simple reference implementation of <code>BufferLoader</code>,
+    take a look at <a href="http://webaudioapi.com/samples/shared.js"><em class="hyperlink">http://webaudioapi.com/samples/shared.js</em></a>.</p></section></section>
+  </body>
+</html>

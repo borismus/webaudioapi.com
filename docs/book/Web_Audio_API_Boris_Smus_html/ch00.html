@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Web Audio API</title>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"> </script>
+    <link rel="stylesheet" type="text/css" href="theme/html/html.css">
+  </head>
+  <body data-type="book">
+    <section xmlns="http://www.w3.org/1999/xhtml" id="introduction" data-type="preface"><h1>Preface</h1><p>Thank you for picking up the first book on the topic of the Web Audio
+  API. When I first learned of the Web Audio API, I was a complete
+  digital-audio novice embarking on a journey to learn and understand the API,
+  as well as the underlying fundamental audio concepts. This book is what I
+  wish existed when I started experimenting with the API in 2011. It is
+  intended to be a springboard for web developers like I was, with little to
+  no digital-audio expertise. It contains the things I learned from about a
+  year of studying digital audio processing, having conversations with audio
+  experts, and experimenting with the API.</p><p>The theoretical bits will be filled in through asides, which will
+  explain the concepts. If you are a digital-audio guru, feel free to skip
+  these. The practical bits will be illustrated with code snippets to give you
+  a better sense of how the API works in real life. Many of the examples also
+  include links to working samples that can be found <a href="http://webaudioapi.com/samples">on this Web Audio API
+  site</a>.</p><section id="s00_3" data-type="sect1"><h1>Structure of This Book</h1><p>This book aims to give a high-level overview of a number of
+    important features of the Web Audio API, but is not an exhaustive survey
+    of every available feature. It is not intended as a comprehensive guide,
+    but as an easy starting point. Most sections of the book start off by
+    describing an application, outlining the problem and solution, and then
+    showing relevant sample JavaScript Web Audio API code. Interspersed theory
+    sections explain some of the underlying audio concepts in more general
+    terms. The book is structured in the following way:</p><ol><li><p><a href="ch01.html#ch01" data-type="xref" data-xrefstyle="chap-num-title">Fundamentals</a> covers the
+        basics of audio graphs, typical graph configurations, audio nodes
+        inside those graphs, loading sound files, and playing sounds
+        back.</p></li><li><p><a href="ch02.html#ch02" data-type="xref" data-xrefstyle="chap-num-title">Perfect Timing and Latency</a> delves into
+        precise scheduling of sound in the future, multiple simultaneous
+        sounds, changing parameters directly or over time, and
+        crossfading.</p></li><li><p><a href="ch03.html#ch03" data-type="xref" data-xrefstyle="chap-num-title">Volume and Loudness</a> covers gain,
+        volume, and loudness, as well as preventing clipping via metering and
+        dynamics compression.</p></li><li><p><a href="ch04.html#ch04" data-type="xref" data-xrefstyle="chap-num-title">Pitch and the Frequency Domain</a> is all about
+        sound frequency, an important property of periodic sound. We’ll also
+        talk about oscillators and examining sound in the frequency <span class="keep-together">domain</span>.</p></li><li><p><a href="ch05.html#ch05" data-type="xref" data-xrefstyle="chap-num-title">Analysis and Visualization</a> builds on the
+        earlier chapters to dive into more advanced topics, including biquad
+        filters, simulating acoustic environments, and spatialized
+        sounds.</p></li><li><p>In <a href="ch06.html#ch06" data-type="xref" data-xrefstyle="chap-num-title">Advanced Topics</a>, we will
+        take a break from synthesizing and manipulating sound, and analyze and
+        visualize sound instead.</p></li><li><p><a href="ch07.html#ch07" data-type="xref" data-xrefstyle="chap-num-title">Integrating with Other Technologies</a> talks about
+        interfacing Web Audio API with other web APIs like WebRTC and the
+        <code>&lt;audio&gt;</code> tag.</p></li></ol><p>The source code of the book itself is released under the Creative
+    Commons license and is available on <a href="https://github.com/borismus/webaudioapi.com">GitHub</a>.</p></section><section data-type="sect1" id="conventions-used-in-this-book-rOsyIa"><h1>Conventions Used in This Book</h1><p>The following typographical conventions are used in this
+    book:</p><dl><dt><em>Italic</em></dt><dd><p>Indicates new terms, URLs, email addresses, filenames, and
+          file extensions.</p></dd><dt><code>Constant width</code></dt><dd><p>Used for program listings, as well as within paragraphs to
+          refer to program elements such as variable or function names,
+          databases, data types, environment variables, statements, and
+          keywords.</p></dd><dt><strong><code>Constant width
+        bold</code></strong></dt><dd><p>Shows commands or other text that should be typed literally by
+          the user.</p></dd><dt><em><code>Constant width italic</code></em></dt><dd><p>Shows text that should be replaced with user-supplied values
+          or by values determined by context.</p></dd></dl><div data-type="tip" id="id-6nT2C6I4"><h6>Tip</h6><p>This icon signifies a tip, suggestion, or general note.</p></div><div data-type="caution" id="id-vKTjIdIN"><h6>Caution</h6><p>This icon indicates a warning or caution.</p></div></section><section data-type="sect1" id="using-code-examples-gOsrUa"><h1>Using Code Examples</h1><p>This book is here to help you get your job done. In general, if this
+    book includes code examples, you may use the code in your programs and
+    documentation. You do not need to contact us for permission unless you’re
+    reproducing a significant portion of the code. For example, writing a
+    program that uses several chunks of code from this book does not require
+    permission. Selling or distributing a CD-ROM of examples from O’Reilly
+    books does require permission. Answering a question by citing this book
+    and quoting example code does not require permission. Incorporating a
+    significant amount of example code from this book into your product’s
+    documentation does require permission.</p><p>We appreciate, but do not require, attribution. An attribution
+    usually includes the title, author, publisher, and ISBN. For example:
+    “<em>Web Audio API</em> by Boris Smus (O’Reilly). Copyright
+    2013 Boris Smus, 978-1-449-33268-6.”</p><p>If you feel your use of code examples falls outside fair use or the
+    permission given above, feel free to contact us at
+    <a class="email" href="mailto:permissions@oreilly.com"><em>permissions@oreilly.com</em></a>.</p></section><section data-type="sect1" id="safarir-books-online-jms4Sm"><h1>Safari® Books Online</h1><div class="safarienabled" data-type="note" id="id-6nTXH4S4"><h6>Note</h6><p>Safari Books Online (<a href="http://my.safaribooksonline.com/?portal=oreilly" class="orm:hideurl:ital"><em class="hyperlink">www.safaribooksonline.com</em></a>)
+      is an on-demand digital library that delivers expert <a href="http://www.safaribooksonline.com/content" class="orm:hideurl">content</a> in both
+      book and video form from the world’s leading authors in technology and
+      business.</p></div><p>Technology professionals, software developers, web designers, and
+    business and creative professionals use Safari Books Online as their
+    primary resource for research, problem solving, learning, and
+    certification training.</p><p>Safari Books Online offers a range of <a href="http://www.safaribooksonline.com/subscriptions" class="orm:hideurl">product mixes</a>
+    and pricing programs for <a href="http://www.safaribooksonline.com/organizations-teams" class="orm:hideurl">organizations</a>,
+    <a href="http://www.safaribooksonline.com/government" class="orm:hideurl">government
+    agencies</a>, and <a href="http://www.safaribooksonline.com/individuals" class="orm:hideurl">individuals</a>.
+    Subscribers have access to thousands of books, training videos, and
+    prepublication manuscripts in one fully searchable database from
+    publishers like O’Reilly Media, Prentice Hall Professional, Addison-Wesley
+    Professional, Microsoft Press, Sams, Que, Peachpit Press, Focal Press,
+    Cisco Press, John Wiley &amp; Sons, Syngress, Morgan Kaufmann, IBM
+    Redbooks, Packt, Adobe Press, FT Press, Apress, Manning, New Riders,
+    McGraw-Hill, Jones &amp; Bartlett, Course Technology, and dozens <a href="http://www.safaribooksonline.com/publishers" class="orm:hideurl">more</a>. For more
+    information about Safari Books Online, please visit us <a href="http://www.safaribooksonline.com/" class="orm:hideurl">online</a>.</p></section><section data-type="sect1" id="how-to-contact-us-1ksvfm"><h1>How to Contact Us</h1><p>Please address comments and questions concerning this book to the
+    publisher:</p><ul class="simplelist"><li>O’Reilly Media, Inc.</li><li>1005 Gravenstein Highway North</li><li>Sebastopol, CA 95472</li><li>800-998-9938 (in the United States or Canada)</li><li>707-829-0515 (international or local)</li><li>707-829-0104 (fax)</li></ul><p>We have a web page for this book, where we list errata, examples,
+    and any additional information. You can access this page at <a href="http://oreil.ly/web-audio-api"><em class="hyperlink">http://oreil.ly/web-audio-api</em></a>.</p><!--Don’t forget to update the <url> attribute, too.--><p>To comment or ask technical questions about this book, send email to
+    <a class="email" href="mailto:bookquestions@oreilly.com"><em>bookquestions@oreilly.com</em></a>.</p><p>For more information about our books, courses, conferences, and
+    news, see our website at <a href="http://www.oreilly.com"><em class="hyperlink">http://www.oreilly.com</em></a>.</p><p>Find us on Facebook: <a href="http://facebook.com/oreilly"><em class="hyperlink">http://facebook.com/oreilly</em></a></p><p>Follow us on Twitter: <a href="http://twitter.com/oreillymedia"><em class="hyperlink">http://twitter.com/oreillymedia</em></a></p><p>Watch us on YouTube: <a href="http://www.youtube.com/oreillymedia"><em class="hyperlink">http://www.youtube.com/oreillymedia</em></a></p></section><section id="s00_4" data-type="sect1"><h1>Thanks!</h1><p>I am not an expert in digital signals processing, mastering, or
+    mixing by any stretch. I am a software engineer and amateur musician with
+    enough interest in digital audio to spend some time exploring the Web
+    Audio API and wrapping my head around some of its important concepts. To
+    write this book, I had to continually bug others with far more
+    digital-audio experience than me. I’d like to thank them for answering my
+    questions, providing technical reviews for this book, and encouraging me
+    along the way.</p><p>Specifically, this book could not have been written without the
+    generous mentorship of Chris Rogers, the primary author of the Web Audio
+    specification and also its main WebKit/Chrome implementer. I owe many
+    thanks to Chris Wilson, who gave an incredibly thorough technical review
+    of this book’s content, and to Mark Goldstein, who spent a few late nights
+    doing editorial passes. My thanks to Kevin Ennis for donating <a href="http://webaudioapi.com">webaudioapi.com</a> for hosting samples
+    related to the book. Last but not least, I would have never written this
+    book without the support and interest of a vibrant Web Audio API community
+    on the Web.</p><p>Without further ado, let’s dive in!</p></section></section>
+  </body>
+</html>

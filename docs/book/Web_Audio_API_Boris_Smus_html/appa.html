@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Web Audio API</title>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"> </script>
+    <link rel="stylesheet" type="text/css" href="theme/html/html.css">
+  </head>
+  <body data-type="book">
+    <section xmlns="http://www.w3.org/1999/xhtml" id="app01" data-type="appendix"><h1>Deprecation Notes</h1><p>The Web Audio API is still evolving, and some methods are being added,
+  removed, and renamed. This section describes some of the recent changes made
+  to the API:</p><ul><li><p><code>AudioBufferSourceNode.noteOn()</code>
+      has been changed to <code>start()</code>.</p></li><li><p><code>AudioBufferSourceNode.noteGrainOn()</code> has been
+      changed to <code>start()</code>.</p></li><li><p><code>AudioBufferSourceNode.noteOff()</code>
+      has been changed to <code>stop()</code>.</p></li><li><p><code>AudioContext.createGainNode()</code>
+      has been changed to <code>createGain()</code>.</p></li><li><p><code>AudioContext.createDelayNode()</code>
+      has been changed to <code>createDelay()</code>.</p></li><li><p><code>AudioContext.createJavaScriptNode()</code> has been
+      changed to <code>createScriptProcessor()</code>.</p></li><li><p><code>OscillatorNode.noteOn()</code> has
+      been changed to <code>start()</code>.</p></li><li><p><code>OscillatorNode.noteOff()</code> has
+      been changed to <code>stop()</code>.</p></li><li><p><code>AudioParam.setTargetValueAtTime()</code> has been
+      changed to <code>setTargetAtTime()</code>.</p></li></ul><p>In addition to these changes, many of the constants in the Web Audio
+  API are changing from variables into string enumerations. For example,
+  filter types are going from <code>filter.LOWPASS</code> to <code>lowpass</code>, oscillator types are going from <code>osc.SINE</code> to <code>sine</code>, etc.</p><p>Throughout the book, I’ve used new versions of all of the APIs, so
+  those using older implementations of the API may need to revert back to
+  earlier methods and constant naming.</p><p>For the most up-to-date information regarding naming changes, see the
+  <a href="http://bit.ly/105wGL0">Web Audio specification</a>.</p></section>
+  </body>
+</html>
