@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Web Audio API</title>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"> </script>
+    <link rel="stylesheet" type="text/css" href="theme/html/html.css">
+  </head>
+  <body data-type="book">
+    <nav data-type="toc">
+<ol>
+  <li data-type="preface">
+    <a href="ch00.html">Preface</a>
+            <ol>
+  <li data-type="sect1">
+    <a href="ch00.html#s00_3">Structure of This Book</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch00.html#conventions-used-in-this-book-rOsyIa">Conventions Used in This Book</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch00.html#using-code-examples-gOsrUa">Using Code Examples</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch00.html#safarir-books-online-jms4Sm">Safari® Books Online</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch00.html#how-to-contact-us-1ksvfm">How to Contact Us</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch00.html#s00_4">Thanks!</a>
+            <ol>
+</ol>
+      </li>
+</ol>
+      </li>
+  <li data-type="chapter">
+    <a href="ch01.html">Fundamentals</a>
+            <ol>
+  <li data-type="sect1">
+    <a href="ch01.html#s00_1">A Brief History of Audio on the Web</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch01.html#s00_2">Games and Interactivity</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch01.html#s01_1">The Audio Context</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch01.html#s01_2">Initializing an Audio Context</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch01.html#s01_3">Types of Web Audio Nodes</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch01.html#s01_4">Connecting the Audio Graph</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch01.html#s01_5">Power of Modular Routing</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch01.html#s01_8">Loading and Playing Sounds</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch01.html#s01_9">Putting It All Together</a>
+            <ol>
+</ol>
+      </li>
+</ol>
+      </li>
+  <li data-type="chapter">
+    <a href="ch02.html">Perfect Timing and Latency</a>
+            <ol>
+  <li data-type="sect1">
+    <a href="ch02.html#s02_1">Timing Model</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch02.html#s02_2">Precise Playback and Resume</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch02.html#s02_3">Scheduling Precise Rhythms</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch02.html#s02_4">Changing Audio Parameters</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch02.html#s02_5">Gradually Varying Audio Parameters</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch02.html#s02_6">Custom Timing Curves</a>
+            <ol>
+</ol>
+      </li>
+</ol>
+      </li>
+  <li data-type="chapter">
+    <a href="ch03.html">Volume and Loudness</a>
+            <ol>
+  <li data-type="sect1">
+    <a href="ch03.html#s03_2">Equal Power Crossfading</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch03.html#s03_4">Using Meters to Detect and Prevent Clipping</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch03.html#s03_6">Dynamics Compression</a>
+            <ol>
+</ol>
+      </li>
+</ol>
+      </li>
+  <li data-type="chapter">
+    <a href="ch04.html">Pitch and the Frequency Domain</a>
+            <ol>
+  <li data-type="sect1">
+    <a href="ch04.html#s04_2">Pitch and playbackRate</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch04.html#s04_3">Multiple Sounds with Variations</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch04.html#s04_5">Oscillator-Based Direct Sound Synthesis</a>
+            <ol>
+</ol>
+      </li>
+</ol>
+      </li>
+  <li data-type="chapter">
+    <a href="ch05.html">Analysis and Visualization</a>
+            <ol>
+  <li data-type="sect1">
+    <a href="ch05.html#s05_1">Frequency Analysis</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch05.html#s05_2">Animating with requestAnimationFrame</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch05.html#s05_3">Visualizing Sound</a>
+            <ol>
+</ol>
+      </li>
+</ol>
+      </li>
+  <li data-type="chapter">
+    <a href="ch06.html">Advanced Topics</a>
+            <ol>
+  <li data-type="sect1">
+    <a href="ch06.html#s06_2">Adding Effects via Filters</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch06.html#s06_3">Procedurally Generated Sound</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch06.html#s06_4">Room Effects</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch06.html#s06_5">Spatialized Sound</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch06.html#s06_6">Audio Processing with JavaScript</a>
+            <ol>
+</ol>
+      </li>
+</ol>
+      </li>
+  <li data-type="chapter">
+    <a href="ch07.html">Integrating with Other Technologies</a>
+            <ol>
+  <li data-type="sect1">
+    <a href="ch07.html#s07_1">Setting Up Background Music with the &lt;audio&gt; Tag</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch07.html#s07_2">Live Audio Input</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="sect1">
+    <a href="ch07.html#s07_3">Page Visibility and Audio Playback</a>
+            <ol>
+</ol>
+      </li>
+</ol>
+      </li>
+  <li data-type="chapter">
+    <a href="ch08.html">Conclusion</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="appendix">
+    <a href="appa.html">Deprecation Notes</a>
+            <ol>
+</ol>
+      </li>
+  <li data-type="appendix">
+    <a href="appb.html">Glossary</a>
+            <ol>
+</ol>
+      </li>
+</ol>
+</nav>
+  </body>
+</html>

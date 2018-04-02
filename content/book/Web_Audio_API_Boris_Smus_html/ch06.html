@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Web Audio API</title>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"> </script>
+    <link rel="stylesheet" type="text/css" href="theme/html/html.css">
+  </head>
+  <body data-type="book">
+    <section xmlns="http://www.w3.org/1999/xhtml" id="ch06" data-type="chapter"><h1>Advanced Topics</h1><p>This chapter covers topics that are very important, but slightly more
+  complex than the rest of the book. We will dive into adding effects to
+  sounds, generating synthetic sound effects without any audio buffers at all,
+  simulating effects of different acoustic environments, and spatializing
+  sound in 3D space.</p><aside id="s06_1" class="theory" data-type="sidebar"><h5>Biquad Filters</h5><p>A filter can emphasize or de-emphasize certain parts of the
+    frequency spectrum of a sound. Visually, it can be shown as a graph over
+    the frequency domain called a <em>frequency response
+    graph</em> (see <a href="#fig24" data-type="xref">Figure 6-1</a>). For each frequency, the
+    higher the value of the graph, the more emphasis is placed on that part of
+    the frequency range. A graph sloping downward places more emphasis on low
+    frequencies and less on high frequencies.</p><p>Web Audio filters can be configured with three parameters: gain,
+    frequency, and a quality factor (also known as Q). These parameters all
+    affect the frequency response graph differently.</p><p>There are many kinds of filters that can be used to achieve certain
+    kinds of effects:</p><dl><dt>Low-pass filter</dt><dd><p>Makes sounds more muffled</p></dd><dt>High-pass filter</dt><dd><p>Makes sounds more tinny</p></dd><dt>Band-pass filter</dt><dd><p>Cuts off lows and highs (e.g., telephone filter)</p></dd><dt>Low-shelf filter</dt><dd><p>Affects the amount of bass in a sound (like the bass knob on a
+          stereo)</p></dd><dt>High-shelf filter</dt><dd><p>Affects the amount of treble in a sound (like the treble knob
+          on a stereo)</p></dd><dt>Peaking filter</dt><dd><p>Affects the amount of midrange in a sound (like the mid knob
+          on a stereo)</p></dd><dt>Notch filter</dt><dd><p>Removes unwanted sounds in a narrow frequency range</p></dd><dt>All-pass filter</dt><dd><p>Creates phaser effects</p></dd></dl><figure id="fig24" style="float: 0"><img src="images/waap_0601.png"><figcaption><span class="label">Figure 6-1. </span>Frequency response graph for a low-pass filter</figcaption></figure><p>All of these biquad filters stem from a common mathematical model
+    and can all be graphed like the low-pass filter in <a href="#fig24" data-type="xref">Figure 6-1</a>. More details about these filters can be found in more
+    mathematically demanding books such as <em>Real Sound Synthesis for
+    Interactive Applications</em> by Perry R. Cook (A K Peters, 2002),
+    which I highly recommend reading if you are interested in audio
+    fundamentals.</p></aside><section id="s06_2" data-type="sect1"><h1>Adding Effects via Filters</h1><p>Using the Web Audio API, we can apply the filters discussed above
+    using <code>BiquadFilterNodes</code>. This type of audio node is very
+    commonly used to build equalizers and manipulate sounds in interesting
+    ways. Let’s set up a simple low-pass filter to eliminate low frequency
+    noise from a sound sample:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="c1">// Create a filter</code>
+<code class="kd">var</code> <code class="nx">filter</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createBiquadFilter</code><code class="p">();</code>
+<code class="c1">// Note: the Web Audio spec is moving from constants to strings.</code>
+<code class="c1">// filter.type = 'lowpass';</code>
+<code class="nx">filter</code><code class="p">.</code><code class="nx">type</code> <code class="o">=</code> <code class="nx">filter</code><code class="p">.</code><code class="nx">LOWPASS</code><code class="p">;</code>
+<code class="nx">filter</code><code class="p">.</code><code class="nx">frequency</code><code class="p">.</code><code class="nx">value</code> <code class="o">=</code> <code class="mi">100</code><code class="p">;</code>
+<code class="c1">// Connect the source to it, and the filter to the destination.</code></pre><p class="online_only">
+    {{jsbin width="100%" height="396px" src="http://orm-other.s3.amazonaws.com/webaudioapi/samples/filter/index.html"}}
+    </p><p>The <code>BiquadFilterNode</code> has support for all of the
+    commonly used second-order filter types. We can configure these nodes with
+    the same parameters as discussed in the previous section, and also
+    visualize the frequency response graphs by using the
+    <code>getFrequencyResponse</code> method on the node. Given an array of
+    frequencies, this function returns an array of magnitudes of responses
+    corresponding to each frequency.</p><p>Chris Wilson and Chris Rogers put together a great visualizer sample
+    (<a href="#fig25" data-type="xref">Figure 6-2</a>) that shows the frequency responses of all of
+    the filter types available in the Web Audio API.</p><figure id="fig25" style="float: 0"><img src="images/waap_0602.png"><figcaption><span class="label">Figure 6-2. </span>A graph of the frequency response of a low-pass filter with
+      parameters</figcaption></figure><p class="online_only">
+    <?jsbin width="100%" height="729px" src="http://orm-other.s3.amazonaws.com/webaudioapi/samples/frequency-response/index.html"?>
+    </p></section><section id="s06_3" data-type="sect1"><h1>Procedurally Generated Sound</h1><p>Up to now, we have been assuming that your game’s sound sources are
+    static. An audio designer creates a bunch of assets and hands them over to
+    you. Then, you play them back with some parameterization depending on
+    local conditions (for example, the room ambiance and relative positions of
+    sources and listeners). This approach has a few disadvantages:</p><ol><li><p>Sound assets will be very large. This is especially bad on the
+        Web, where instead of loading from a hard drive, you load from a
+        network (at least the first time), which is roughly an order of
+        magnitude slower.</p></li><li><p>Even with many assets and tweaks to each, there is limited
+        variety.</p></li><li><p>You need to find assets by scouring sound effects libraries, and
+        then maybe worry about royalties. Plus, chances are, any given sound
+        effect is already being used in other applications, so your users have
+        unintended associations.</p></li></ol><p>We can use the Web Audio API to fully generate sound procedurally.
+    For example, let’s simulate a gun firing. We begin with a buffer of white
+    noise, which we can generate with a <code>ScriptProcessorNode</code> as
+    follows:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">function</code> <code class="nx">WhiteNoiseScript</code><code class="p">()</code> <code class="p">{</code>
+  <code class="k">this</code><code class="p">.</code><code class="nx">node</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createScriptProcessor</code><code class="p">(</code><code class="mi">1024</code><code class="p">,</code> <code class="mi">1</code><code class="p">,</code> <code class="mi">2</code><code class="p">);</code>
+  <code class="k">this</code><code class="p">.</code><code class="nx">node</code><code class="p">.</code><code class="nx">onaudioprocess</code> <code class="o">=</code> <code class="k">this</code><code class="p">.</code><code class="nx">process</code><code class="p">;</code>
+<code class="p">}</code>
+
+<code class="nx">WhiteNoiseScript</code><code class="p">.</code><code class="nx">prototype</code><code class="p">.</code><code class="nx">process</code> <code class="o">=</code> <code class="kd">function</code><code class="p">(</code><code class="nx">e</code><code class="p">)</code> <code class="p">{</code>
+  <code class="kd">var</code> <code class="nx">L</code> <code class="o">=</code> <code class="nx">e</code><code class="p">.</code><code class="nx">outputBuffer</code><code class="p">.</code><code class="nx">getChannelData</code><code class="p">(</code><code class="mi">0</code><code class="p">);</code>
+  <code class="kd">var</code> <code class="nx">R</code> <code class="o">=</code> <code class="nx">e</code><code class="p">.</code><code class="nx">outputBuffer</code><code class="p">.</code><code class="nx">getChannelData</code><code class="p">(</code><code class="mi">1</code><code class="p">);</code>
+  <code class="k">for</code> <code class="p">(</code><code class="kd">var</code> <code class="nx">i</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code> <code class="nx">i</code> <code class="o">&lt;</code> <code class="nx">L</code><code class="p">.</code><code class="nx">length</code><code class="p">;</code> <code class="nx">i</code><code class="o">++</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nx">L</code><code class="p">[</code><code class="nx">i</code><code class="p">]</code> <code class="o">=</code> <code class="p">((</code><code class="nb">Math</code><code class="p">.</code><code class="nx">random</code><code class="p">()</code> <code class="o">*</code> <code class="mi">2</code><code class="p">)</code> <code class="o">-</code> <code class="mi">1</code><code class="p">);</code>
+    <code class="nx">R</code><code class="p">[</code><code class="nx">i</code><code class="p">]</code> <code class="o">=</code> <code class="nx">L</code><code class="p">[</code><code class="nx">i</code><code class="p">];</code>
+  <code class="p">}</code>
+<code class="p">};</code></pre><p>For more information on <code>ScriptProcessorNode</code>s, see
+    <a href="#s06_6" data-type="xref">Audio Processing with JavaScript</a>.</p><p>This code is not an efficient implementation because JavaScript is
+    required to constantly and dynamically create a stream of white noise. To
+    increase efficiency, we can programmatically generate a mono <code>AudioBuffer</code> of white noise as follows:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">function</code> <code class="nx">WhiteNoiseGenerated</code><code class="p">(</code><code class="nx">callback</code><code class="p">)</code> <code class="p">{</code>
+  <code class="c1">// Generate a 5 second white noise buffer.</code>
+  <code class="kd">var</code> <code class="nx">lengthInSamples</code> <code class="o">=</code> <code class="mi">5</code> <code class="o">*</code> <code class="nx">context</code><code class="p">.</code><code class="nx">sampleRate</code><code class="p">;</code>
+  <code class="kd">var</code> <code class="nx">buffer</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createBuffer</code><code class="p">(</code><code class="mi">1</code><code class="p">,</code> <code class="nx">lengthInSamples</code><code class="p">,</code> <code class="nx">context</code><code class="p">.</code><code class="nx">sampleRate</code><code class="p">);</code>
+  <code class="kd">var</code> <code class="nx">data</code> <code class="o">=</code> <code class="nx">buffer</code><code class="p">.</code><code class="nx">getChannelData</code><code class="p">(</code><code class="mi">0</code><code class="p">);</code>
+
+  <code class="k">for</code> <code class="p">(</code><code class="kd">var</code> <code class="nx">i</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code> <code class="nx">i</code> <code class="o">&lt;</code> <code class="nx">lengthInSamples</code><code class="p">;</code> <code class="nx">i</code><code class="o">++</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nx">data</code><code class="p">[</code><code class="nx">i</code><code class="p">]</code> <code class="o">=</code> <code class="p">((</code><code class="nb">Math</code><code class="p">.</code><code class="nx">random</code><code class="p">()</code> <code class="o">*</code> <code class="mi">2</code><code class="p">)</code> <code class="o">-</code> <code class="mi">1</code><code class="p">);</code>
+  <code class="p">}</code>
+
+  <code class="c1">// Create a source node from the buffer.</code>
+  <code class="k">this</code><code class="p">.</code><code class="nx">node</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createBufferSource</code><code class="p">();</code>
+  <code class="k">this</code><code class="p">.</code><code class="nx">node</code><code class="p">.</code><code class="nx">buffer</code> <code class="o">=</code> <code class="nx">buffer</code><code class="p">;</code>
+  <code class="k">this</code><code class="p">.</code><code class="nx">node</code><code class="p">.</code><code class="nx">loop</code> <code class="o">=</code> <code class="kc">true</code><code class="p">;</code>
+  <code class="k">this</code><code class="p">.</code><code class="nx">node</code><code class="p">.</code><code class="nx">start</code><code class="p">(</code><code class="mi">0</code><code class="p">);</code>
+<code class="p">}</code></pre><p>Next, we can simulate various phases of the gun firing—attack,
+    decay, and release—in an envelope:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">function</code> <code class="nx">Envelope</code><code class="p">()</code> <code class="p">{</code>
+  <code class="k">this</code><code class="p">.</code><code class="nx">node</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createGain</code><code class="p">()</code>
+  <code class="k">this</code><code class="p">.</code><code class="nx">node</code><code class="p">.</code><code class="nx">gain</code><code class="p">.</code><code class="nx">value</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code>
+<code class="p">}</code>
+
+<code class="nx">Envelope</code><code class="p">.</code><code class="nx">prototype</code><code class="p">.</code><code class="nx">addEventToQueue</code> <code class="o">=</code> <code class="kd">function</code><code class="p">()</code> <code class="p">{</code>
+  <code class="k">this</code><code class="p">.</code><code class="nx">node</code><code class="p">.</code><code class="nx">gain</code><code class="p">.</code><code class="nx">linearRampToValueAtTime</code><code class="p">(</code><code class="mi">0</code><code class="p">,</code> <code class="nx">context</code><code class="p">.</code><code class="nx">currentTime</code><code class="p">);</code>
+  <code class="k">this</code><code class="p">.</code><code class="nx">node</code><code class="p">.</code><code class="nx">gain</code><code class="p">.</code><code class="nx">linearRampToValueAtTime</code><code class="p">(</code><code class="mi">1</code><code class="p">,</code> <code class="nx">context</code><code class="p">.</code><code class="nx">currentTime</code> <code class="o">+</code> <code class="mf">0.001</code><code class="p">);</code>
+  <code class="k">this</code><code class="p">.</code><code class="nx">node</code><code class="p">.</code><code class="nx">gain</code><code class="p">.</code><code class="nx">linearRampToValueAtTime</code><code class="p">(</code><code class="mf">0.3</code><code class="p">,</code> <code class="nx">context</code><code class="p">.</code><code class="nx">currentTime</code> <code class="o">+</code> <code class="mf">0.101</code><code class="p">);</code>
+  <code class="k">this</code><code class="p">.</code><code class="nx">node</code><code class="p">.</code><code class="nx">gain</code><code class="p">.</code><code class="nx">linearRampToValueAtTime</code><code class="p">(</code><code class="mi">0</code><code class="p">,</code> <code class="nx">context</code><code class="p">.</code><code class="nx">currentTime</code> <code class="o">+</code> <code class="mf">0.500</code><code class="p">);</code>
+<code class="p">};</code></pre><p>Finally, we can connect the voice outputs to a filter to allow a
+    simulation of distance:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true">  <code class="k">this</code><code class="p">.</code><code class="nx">voices</code> <code class="o">=</code> <code class="p">[];</code>
+  <code class="k">this</code><code class="p">.</code><code class="nx">voiceIndex</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code>
+
+  <code class="kd">var</code> <code class="nx">noise</code> <code class="o">=</code> <code class="k">new</code> <code class="nx">WhiteNoise</code><code class="p">();</code>
+
+  <code class="kd">var</code> <code class="nx">filter</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createBiquadFilter</code><code class="p">();</code>
+  <code class="nx">filter</code><code class="p">.</code><code class="nx">type</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code>
+  <code class="nx">filter</code><code class="p">.</code><code class="nx">Q</code><code class="p">.</code><code class="nx">value</code> <code class="o">=</code> <code class="mi">1</code><code class="p">;</code>
+  <code class="nx">filter</code><code class="p">.</code><code class="nx">frequency</code><code class="p">.</code><code class="nx">value</code> <code class="o">=</code> <code class="mi">800</code><code class="p">;</code>
+
+  <code class="c1">// Initialize multiple voices.</code>
+  <code class="k">for</code> <code class="p">(</code><code class="kd">var</code> <code class="nx">i</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code> <code class="nx">i</code> <code class="o">&lt;</code> <code class="nx">VOICE_COUNT</code><code class="p">;</code> <code class="nx">i</code><code class="o">++</code><code class="p">)</code> <code class="p">{</code>
+    <code class="kd">var</code> <code class="nx">voice</code> <code class="o">=</code> <code class="k">new</code> <code class="nx">Envelope</code><code class="p">();</code>
+    <code class="nx">noise</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">voice</code><code class="p">.</code><code class="nx">node</code><code class="p">);</code>
+    <code class="nx">voice</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">filter</code><code class="p">);</code>
+    <code class="k">this</code><code class="p">.</code><code class="nx">voices</code><code class="p">.</code><code class="nx">push</code><code class="p">(</code><code class="nx">voice</code><code class="p">);</code>
+  <code class="p">}</code>
+
+  <code class="kd">var</code> <code class="nx">gainMaster</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createGainNode</code><code class="p">();</code>
+  <code class="nx">gainMaster</code><code class="p">.</code><code class="nx">gain</code><code class="p">.</code><code class="nx">value</code> <code class="o">=</code> <code class="mi">5</code><code class="p">;</code>
+  <code class="nx">filter</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">gainMaster</code><code class="p">);</code>
+
+  <code class="nx">gainMaster</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">context</code><code class="p">.</code><code class="nx">destination</code><code class="p">);</code></pre><p>This example is borrowed from BBC’s <a href="http://webaudio.prototyping.bbc.co.uk/gunfire/">gunfire effects
+    page</a> with small modifications, including a port to
+    JavaScript.</p><p class="online_only">
+    <?jsbin width="100%" height="310px" src="http://orm-other.s3.amazonaws.com/webaudioapi/samples/procedural/index.html"?>
+    </p><p>As you can see, this approach is very powerful but gets complicated
+    pretty quickly, going beyond the scope of this book. For more information
+    about procedural sound generation, take a look at <a href="http://obiwannabe.co.uk/tutorials/html/tutorials_main.html">Andy
+    Farnell’s Practical Synthetic Sound Design</a> tutorials and
+    book.</p></section><section id="s06_4" data-type="sect1"><h1>Room Effects</h1><p>Before sound gets from its source to our ears, it bounces off walls,
+    buildings, furniture, carpets, and other objects. Every such collision
+    changes properties of the sound. For example, clapping your hands outside
+    sounds very different from clapping your hands inside a large cathedral,
+    which can cause audible reverberations for several seconds. Games with
+    high production value aim to imitate these effects. Creating a separate
+    set of samples for each acoustic environment is often prohibitively
+    expensive, since it requires a lot of effort from the audio designer, and
+    a lot of assets, and thus a larger amount of game data.</p><p>The Web Audio API comes with a facility to simulate these various
+    acoustic environments called a <code>ConvolverNode</code>. Examples of effects that you can
+    get out of the convolution engine include chorus effects, reverberation,
+    and telephone-like speech.</p><p>The idea for producing room effects is to play back a reference
+    sound in a room, record it, and then (metaphorically) take the difference
+    between the original sound and the recorded one. The result of this is an
+    impulse response that captures the effect that the room has on a sound.
+    These impulse responses are painstakingly recorded in very specific studio
+    settings, and doing this on your own requires serious dedication. Luckily,
+    there are sites that host many of these pre-recorded impulse response
+    files (stored as audio files) for your convenience.</p><p>The Web Audio API provides an easy way to apply these impulse
+    responses to your sounds using the <code>ConvolverNode</code>. This node takes an impulse
+    response buffer, which is a regular <code>AudioBuffer</code> with the impulse response file
+    loaded into it. The convolver is effectively a very complex filter (like
+    the <code>BiquadFilterNode</code>), but rather than
+    selecting from a set of effect types, it can be configured with an
+    arbitrary filter response:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">var</code> <code class="nx">impulseResponseBuffer</code> <code class="o">=</code> <code class="kc">null</code><code class="p">;</code>
+<code class="kd">function</code> <code class="nx">loadImpulseResponse</code><code class="p">()</code> <code class="p">{</code>
+  <code class="nx">loadBuffer</code><code class="p">(</code><code class="s1">'impulse.wav'</code><code class="p">,</code> <code class="kd">function</code><code class="p">(</code><code class="nx">buffer</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nx">impulseResponseBuffer</code> <code class="o">=</code> <code class="nx">buffer</code><code class="p">;</code>
+  <code class="p">});</code>
+<code class="p">}</code>
+
+<code class="kd">function</code> <code class="nx">play</code><code class="p">()</code> <code class="p">{</code>
+  <code class="c1">// Make a source node for the sample.</code>
+  <code class="kd">var</code> <code class="nx">source</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createBufferSource</code><code class="p">();</code>
+  <code class="nx">source</code><code class="p">.</code><code class="nx">buffer</code> <code class="o">=</code> <code class="k">this</code><code class="p">.</code><code class="nx">buffer</code><code class="p">;</code>
+  <code class="c1">// Make a convolver node for the impulse response.</code>
+  <code class="kd">var</code> <code class="nx">convolver</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createConvolver</code><code class="p">();</code>
+  <code class="c1">// Set the impulse response buffer.</code>
+  <code class="nx">convolver</code><code class="p">.</code><code class="nx">buffer</code> <code class="o">=</code> <code class="nx">impulseResponseBuffer</code><code class="p">;</code>
+  <code class="c1">// Connect graph.</code>
+  <code class="nx">source</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">convolver</code><code class="p">);</code>
+  <code class="nx">convolver</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">context</code><code class="p">.</code><code class="nx">destination</code><code class="p">);</code>
+<code class="p">}</code></pre><p>The convolver node “smushes” the input sound and its impulse
+    response by computing a convolution, a mathematically intensive function.
+    The result is something that sounds as if it was produced in the room
+    where the impulse response was recorded. In practice, it often makes sense
+    to mix the original sound (called the <em>dry mix</em>) with
+    the convolved sound (called the <em>wet mix</em>), and use an
+    equal-power crossfade to control how much of the effect you want to
+    apply.</p><p>It’s also possible to generate these impulse responses
+    synthetically, but this topic is outside of the scope of this book.</p><p class="online_only">
+    <?jsbin width="100%" height="294px" src="http://orm-other.s3.amazonaws.com/webaudioapi/samples/room-effects/index.html"?>
+    </p></section><section id="s06_5" data-type="sect1"><h1>Spatialized Sound</h1><p>Games are often set in a world where objects have positions in
+    space, either in 2D or in 3D. If this is the case, spatialized audio can
+    greatly increase the immersiveness of the experience. Luckily, the Web
+    Audio API comes with built-in positional audio features (stereo for now)
+    that are quite straightforward to use.</p><p>As you <a href="http://connect.creativelabs.com/openal/default.aspx">experiment with
+    spatialized sound</a>, make sure that you are listening through stereo
+    speakers (preferably headphones). This will give you a better idea of how
+    the left and right channels are being transformed by your spatialization
+    approach.</p><p>The Web Audio API model has three aspects of increasing complexity,
+    with many concepts borrowed from OpenAL:</p><ol><li><p>Position and orientation of sources and listeners</p></li><li><p>Parameters associated with the source audio cones</p></li><li><p>Relative velocities of sources and listeners</p></li></ol><p>There is a single listener (<code>AudioListener</code>) attached to the Web Audio API
+    context that can be configured in space through position and orientation.
+    Each source can be passed through a panner node (<code>AudioPannerNode</code>), which spatializes the input
+    audio. Based on the relative position of the sources and the listener, the
+    Web Audio API computes the correct gain modifications.</p><p>There are a few things to know about the assumptions that the API
+    makes. The first is that the listener is at the origin (0, 0, 0) by
+    default. Positional API coordinates are unitless, so in practice, it takes
+    some multiplier tweaking to make things sound the way you want. Secondly,
+    orientations are specified as direction vectors (with a length of one).
+    Finally, in this coordinate space, positive <em>y</em> points
+    upward, which is the opposite of most computer graphics systems.</p><p>With these things in mind, here’s an example of how you can change
+    the position of a source node that is being spatialized in 2D via a panner
+    node (<code>PannerNode</code>):</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="c1">// Position the listener at the origin (the default, just added for the sake of being explicit)</code>
+<code class="nx">context</code><code class="p">.</code><code class="nx">listener</code><code class="p">.</code><code class="nx">setPosition</code><code class="p">(</code><code class="mi">0</code><code class="p">,</code> <code class="mi">0</code><code class="p">,</code> <code class="mi">0</code><code class="p">);</code>
+
+<code class="c1">// Position the panner node.</code>
+<code class="c1">// Assume X and Y are in screen coordinates and the listener is at screen center.</code>
+<code class="kd">var</code> <code class="nx">panner</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createPanner</code><code class="p">();</code>
+<code class="kd">var</code> <code class="nx">centerX</code> <code class="o">=</code> <code class="nx">WIDTH</code><code class="o">/</code><code class="mi">2</code><code class="p">;</code>
+<code class="kd">var</code> <code class="nx">centerY</code> <code class="o">=</code> <code class="nx">HEIGHT</code><code class="o">/</code><code class="mi">2</code><code class="p">;</code>
+<code class="kd">var</code> <code class="nx">x</code> <code class="o">=</code> <code class="p">(</code><code class="nx">X</code> <code class="o">-</code> <code class="nx">centerX</code><code class="p">)</code>  <code class="o">/</code> <code class="nx">WIDTH</code><code class="p">;</code>
+<code class="c1">// The y coordinate is flipped to match the canvas coordinate space.</code>
+<code class="kd">var</code> <code class="nx">y</code> <code class="o">=</code> <code class="p">(</code><code class="nx">Y</code> <code class="o">-</code> <code class="nx">centerY</code><code class="p">)</code> <code class="o">/</code> <code class="nx">HEIGHT</code><code class="p">;</code>
+<code class="c1">// Place the z coordinate slightly in behind the listener.</code>
+<code class="kd">var</code> <code class="nx">z</code> <code class="o">=</code> <code class="o">-</code><code class="mf">0.5</code><code class="p">;</code>
+<code class="c1">// Tweak multiplier as necessary.</code>
+<code class="kd">var</code> <code class="nx">scaleFactor</code> <code class="o">=</code> <code class="mi">2</code><code class="p">;</code>
+<code class="nx">panner</code><code class="p">.</code><code class="nx">setPosition</code><code class="p">(</code><code class="nx">x</code> <code class="o">*</code> <code class="nx">scaleFactor</code><code class="p">,</code> <code class="nx">y</code> <code class="o">*</code> <code class="nx">scaleFactor</code><code class="p">,</code> <code class="nx">z</code><code class="p">);</code>
+
+<code class="c1">// Convert angle into a unit vector.</code>
+<code class="nx">panner</code><code class="p">.</code><code class="nx">setOrientation</code><code class="p">(</code><code class="nb">Math</code><code class="p">.</code><code class="nx">cos</code><code class="p">(</code><code class="nx">angle</code><code class="p">),</code> <code class="o">-</code><code class="nb">Math</code><code class="p">.</code><code class="nx">sin</code><code class="p">(</code><code class="nx">angle</code><code class="p">),</code> <code class="mi">1</code><code class="p">);</code>
+
+<code class="c1">// Connect the node you want to spatialize to a panner.</code>
+<code class="nx">source</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">panner</code><code class="p">);</code></pre><p>In addition to taking into account relative positions and
+    orientations, each source has a configurable audio cone, as shown in <a href="#fig26" data-type="xref">Figure 6-3</a>.</p><figure id="fig26" style="float: 0"><img src="images/waap_0603.png"><figcaption><span class="label">Figure 6-3. </span>A diagram of panners and the listener in 2D space</figcaption></figure><p>Once you have specified an inner and outer cone, you end up with a
+    separation of space into three parts, as seen in <a href="#fig26" data-type="xref">Figure 6-3</a>:</p><ol><li><p>Inner cone</p></li><li><p>Outer cone</p></li><li><p>Neither cone</p></li></ol><p>Each of these sub-spaces can have a gain multiplier associated with
+    it as an extra hint for the positional model. For example, to emulate
+    targeted sound, we might have the following configuration:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="nx">panner</code><code class="p">.</code><code class="nx">coneInnerAngle</code> <code class="o">=</code> <code class="mi">5</code><code class="p">;</code>
+<code class="nx">panner</code><code class="p">.</code><code class="nx">coneOuterAngle</code> <code class="o">=</code> <code class="mi">10</code><code class="p">;</code>
+<code class="nx">panner</code><code class="p">.</code><code class="nx">coneGain</code> <code class="o">=</code> <code class="mf">0.5</code><code class="p">;</code>
+<code class="nx">panner</code><code class="p">.</code><code class="nx">coneOuterGain</code> <code class="o">=</code> <code class="mf">0.2</code><code class="p">;</code></pre><p>A dispersed sound can have a very different set of parameters. An
+    omnidirectional source has a 360-degree inner cone, and its orientation
+    makes no difference for <span class="keep-together">spatialization</span>:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="nx">panner</code><code class="p">.</code><code class="nx">coneInnerAngle</code> <code class="o">=</code> <code class="mi">180</code><code class="p">;</code>
+<code class="nx">panner</code><code class="p">.</code><code class="nx">coneGain</code> <code class="o">=</code> <code class="mf">0.5</code><code class="p">;</code></pre><p>In addition to position, orientation, and sound cones, sources and
+    listeners can also specify velocity. This value is important for
+    simulating pitch changes as a result of the doppler effect.</p><p class="online_only">
+    <?jsbin width="100%" height="613px" src="http://orm-other.s3.amazonaws.com/webaudioapi/samples/spatialized/index.html"?>
+    </p></section><section id="s06_6" data-type="sect1"><h1>Audio Processing with JavaScript</h1><p>Generally speaking, the Web Audio API aims to provide enough
+    primitives (mostly via audio nodes) to do most common audio tasks. The
+    idea is that these modules are written in C++ and are much faster than the
+    same code written in JavaScript.</p><p>However, the API also provides a <code>ScriptProcessorNode</code>
+    that lets web developers synthesize and process audio directly in
+    JavaScript. For example, you could prototype custom DSP effects using this
+    approach, or illustrate concepts for educational applications.</p><p>To get started, create a <code>ScriptProcessorNode</code>.
+    This node processes sound in chunks specified as a parameter to the node
+    (<code>bufferSize</code>), which must be a power of two. Err on the
+    side of using a larger buffer, since it gives you more of a safety margin
+    against glitches if the main thread is busy with other things, such as
+    page re-layout, garbage collection, or JavaScript callbacks:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="c1">// Create a ScriptProcessorNode.</code>
+<code class="kd">var</code> <code class="nx">processor</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createScriptProcessor</code><code class="p">(</code><code class="mi">2048</code><code class="p">);</code>
+<code class="c1">// Assign the onProcess function to be called for every buffer.</code>
+<code class="nx">processor</code><code class="p">.</code><code class="nx">onaudioprocess</code> <code class="o">=</code> <code class="nx">onProcess</code><code class="p">;</code>
+<code class="c1">// Assuming source exists, connect it to a script processor.</code>
+<code class="nx">source</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">processor</code><code class="p">);</code></pre><p>Once you have the audio data piping into a JavaScript function, you
+    can analyze the stream by examining the input buffer, or directly change
+    the output by modifying the output buffer. For example, we can easily swap
+    the left and right channels by implementing the following script
+    processor:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">function</code> <code class="nx">onProcess</code><code class="p">(</code><code class="nx">e</code><code class="p">)</code> <code class="p">{</code>
+  <code class="kd">var</code> <code class="nx">leftIn</code> <code class="o">=</code> <code class="nx">e</code><code class="p">.</code><code class="nx">inputBuffer</code><code class="p">.</code><code class="nx">getChannelData</code><code class="p">(</code><code class="mi">0</code><code class="p">);</code>
+  <code class="kd">var</code> <code class="nx">rightIn</code> <code class="o">=</code> <code class="nx">e</code><code class="p">.</code><code class="nx">inputBuffer</code><code class="p">.</code><code class="nx">getChannelData</code><code class="p">(</code><code class="mi">1</code><code class="p">);</code>
+  <code class="kd">var</code> <code class="nx">leftOut</code> <code class="o">=</code> <code class="nx">e</code><code class="p">.</code><code class="nx">outputBuffer</code><code class="p">.</code><code class="nx">getChannelData</code><code class="p">(</code><code class="mi">0</code><code class="p">);</code>
+  <code class="kd">var</code> <code class="nx">rightOut</code> <code class="o">=</code> <code class="nx">e</code><code class="p">.</code><code class="nx">outputBuffer</code><code class="p">.</code><code class="nx">getChannelData</code><code class="p">(</code><code class="mi">1</code><code class="p">);</code>
+
+  <code class="k">for</code> <code class="p">(</code><code class="kd">var</code> <code class="nx">i</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code> <code class="nx">i</code> <code class="o">&lt;</code> <code class="nx">leftIn</code><code class="p">.</code><code class="nx">length</code><code class="p">;</code> <code class="nx">i</code><code class="o">++</code><code class="p">)</code> <code class="p">{</code>
+    <code class="c1">// Flip left and right channels.</code>
+    <code class="nx">leftOut</code><code class="p">[</code><code class="nx">i</code><code class="p">]</code> <code class="o">=</code> <code class="nx">rightIn</code><code class="p">[</code><code class="nx">i</code><code class="p">];</code>
+    <code class="nx">rightOut</code><code class="p">[</code><code class="nx">i</code><code class="p">]</code> <code class="o">=</code> <code class="nx">leftIn</code><code class="p">[</code><code class="nx">i</code><code class="p">];</code>
+  <code class="p">}</code>
+<code class="p">}</code></pre><p>Note that you should never do this channel swap in production, since
+    using a <code>ChannelSplitterNode</code> followed by
+    a <code>ChannelMergerNode</code> is far more
+    efficient. As another example, we can add a random noise to the mix. We do
+    this by simply adding a random offset to the signal. By making the signal
+    completely random, we can generate white noise, which is actually quite
+    useful in many applications [see <a href="#s06_3" data-type="xref">Procedurally Generated Sound</a>]:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">function</code> <code class="nx">onProcess</code><code class="p">(</code><code class="nx">e</code><code class="p">)</code> <code class="p">{</code>
+  <code class="kd">var</code> <code class="nx">leftOut</code> <code class="o">=</code> <code class="nx">e</code><code class="p">.</code><code class="nx">outputBuffer</code><code class="p">.</code><code class="nx">getChannelData</code><code class="p">(</code><code class="mi">0</code><code class="p">);</code>
+  <code class="kd">var</code> <code class="nx">rightOut</code> <code class="o">=</code> <code class="nx">e</code><code class="p">.</code><code class="nx">outputBuffer</code><code class="p">.</code><code class="nx">getChannelData</code><code class="p">(</code><code class="mi">1</code><code class="p">);</code>
+
+  <code class="k">for</code> <code class="p">(</code><code class="kd">var</code> <code class="nx">i</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code> <code class="nx">i</code> <code class="o">&lt;</code> <code class="nx">leftOut</code><code class="p">.</code><code class="nx">length</code><code class="p">;</code> <code class="nx">i</code><code class="o">++</code><code class="p">)</code> <code class="p">{</code>
+    <code class="c1">// Add some noise</code>
+    <code class="nx">leftOut</code><code class="p">[</code><code class="nx">i</code><code class="p">]</code> <code class="o">+=</code> <code class="p">(</code><code class="nb">Math</code><code class="p">.</code><code class="nx">random</code><code class="p">()</code> <code class="o">-</code> <code class="mf">0.5</code><code class="p">)</code> <code class="o">*</code> <code class="nx">NOISE_FACTOR</code><code class="p">;</code>
+    <code class="nx">rightOut</code><code class="p">[</code><code class="nx">i</code><code class="p">]</code> <code class="o">+=</code> <code class="p">(</code><code class="nb">Math</code><code class="p">.</code><code class="nx">random</code><code class="p">()</code> <code class="o">-</code> <code class="mf">0.5</code><code class="p">)</code> <code class="o">*</code> <code class="nx">NOISE_FACTOR</code><code class="p">;</code>
+  <code class="p">}</code>
+<code class="p">}</code></pre><p>The main issue with using script processing nodes is performance.
+    Using JavaScript to implement these mathematically-intensive algorithms is
+    significantly slower than implementing them directly in the native code of
+    the browser.</p><p class="online_only">
+    <?jsbin width="100%" height="272px" src="http://orm-other.s3.amazonaws.com/webaudioapi/samples/script-processor/index.html"?>
+    </p></section></section>
+  </body>
+</html>

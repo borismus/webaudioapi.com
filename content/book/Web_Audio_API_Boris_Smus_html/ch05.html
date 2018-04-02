@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Web Audio API</title>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"> </script>
+    <link rel="stylesheet" type="text/css" href="theme/html/html.css">
+  </head>
+  <body data-type="book">
+    <section xmlns="http://www.w3.org/1999/xhtml" id="ch05" data-type="chapter"><h1>Analysis and Visualization</h1><p>So far we’ve only talked about audio synthesis and processing, but
+  that is only half of the functionality that the Web Audio API provides. The
+  other half, audio analysis, is all about understanding what the sound that
+  is being played is like. The canonical example of this feature is
+  visualization, but there are many other applications far outside the scope
+  of this book, including pitch detection, rhythm detection, and speech
+  recognition.</p><p>This is an important topic for us as game developers and interactive
+  application builders for a couple of reasons. Firstly, a good visual
+  analyzer can act as a sort of debugging tool (obviously in addition to your
+  ears and a good metering setup) for tweaking sounds to be just right.
+  Secondly, visualization is critical for any games and applications related
+  to music, from games like <em>Guitar Hero</em> to software like
+  GarageBand.</p><section id="s05_1" data-type="sect1"><h1>Frequency Analysis</h1><p>The main way of doing sound analysis with the Web Audio API is to
+    use <code>AnalyserNodes</code>. These nodes do not change the sound in any
+    way, and can be placed anywhere in your audio context. Once this node is
+    in your graph, it provides two main ways for you to inspect the sound
+    wave: over the time domain and over the frequency domain.</p><p>The results you get are based on FFT analysis over a certain buffer
+    size. We have a few knobs to customize the output of the node:</p><dl><dt><code>fftSize</code></dt><dd><p>This defines the buffer size that is used to perform the
+          analysis. It must be a power of two. Higher values will result in
+          more fine-grained analysis of the signal, at the cost of some
+          performance loss.</p></dd><dt><code>frequencyBinCount</code></dt><dd><p>This is a read-only property, set automatically as
+          <code>fftSize</code>/2.</p></dd><dt><code>smoothingTimeConstant</code></dt><dd><p>This is a value between zero and one. A value of one causes a
+          large moving average window and smoothed results. A value of zero
+          means no moving average, and quickly fluctuating results.</p></dd></dl><p>The basic setup is to insert the analyzer node into the interesting
+    part of our audio graph:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="c1">// Assume that node A is ordinarily connected to B.</code>
+<code class="kd">var</code> <code class="nx">analyser</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createAnalyser</code><code class="p">();</code>
+<code class="nx">A</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">analyser</code><code class="p">);</code>
+<code class="nx">analyser</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">B</code><code class="p">);</code></pre><p>Then we can get frequency or time domain arrays as follows:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">var</code> <code class="nx">freqDomain</code> <code class="o">=</code> <code class="k">new</code> <code class="nx">Float32Array</code><code class="p">(</code><code class="nx">analyser</code><code class="p">.</code><code class="nx">frequencyBinCount</code><code class="p">);</code>
+<code class="nx">analyser</code><code class="p">.</code><code class="nx">getFloatFrequencyData</code><code class="p">(</code><code class="nx">freqDomain</code><code class="p">);</code></pre><p>In the previous example, <code>freqDomain</code> is an array of 32-bit floats
+    corresponding to the frequency domain. These values are normalized to be
+    between zero and one. The indexes of the output can be mapped linearly
+    between zero and the <em>nyquist frequency</em>, which is
+    defined to be half of the sampling rate (available in the Web Audio API
+    via <code>context.sampleRate</code>). The following snippet maps from
+    frequency to the correct bucket in the array of frequencies:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">function</code> <code class="nx">getFrequencyValue</code><code class="p">(</code><code class="nx">frequency</code><code class="p">)</code> <code class="p">{</code>
+  <code class="kd">var</code> <code class="nx">nyquist</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">sampleRate</code><code class="o">/</code><code class="mi">2</code><code class="p">;</code>
+  <code class="kd">var</code> <code class="nx">index</code> <code class="o">=</code> <code class="nb">Math</code><code class="p">.</code><code class="nx">round</code><code class="p">(</code><code class="nx">frequency</code><code class="o">/</code><code class="nx">nyquist</code> <code class="o">*</code> <code class="nx">freqDomain</code><code class="p">.</code><code class="nx">length</code><code class="p">);</code>
+  <code class="k">return</code> <code class="nx">freqDomain</code><code class="p">[</code><code class="nx">index</code><code class="p">];</code>
+<code class="p">}</code></pre><p>If we are analyzing a 1,000-Hz sine wave, for example, we would
+    expect that <code>getFrequencyValue(1000)</code>
+    would return a peak value in the graph, as shown in <a href="#fig22" data-type="xref">Figure 5-1</a>.</p><p>The frequency domain is also available in 8-bit unsigned units via
+    the <code>getByteFrequencyData</code> call. The values of these integers
+    is scaled to fit between <code>minDecibels</code> and
+    <code>maxDecibels</code> (in dBFS) properties on the analyzer node, so
+    these parameters can be tweaked to scale the output as desired.</p><figure id="fig22" style="float: 0"><img src="images/waap_0501.png"><figcaption><span class="label">Figure 5-1. </span>A 1,000-Hz tone being visualized (the full domain extends from 0
+      to 22,050 Hz)</figcaption></figure></section><section id="s05_2" data-type="sect1"><h1>Animating with requestAnimationFrame</h1><p>If we want to build a visualization for our soundform, we need to
+    periodically query the analyzer, process the results, and render them. We
+    can do this by setting up a JavaScript timer like <code>setInterval</code>
+    or <code>setTimeout</code>, but there’s a better way:
+    <code>requestAnimationFrame</code>. This API lets the browser incorporate
+    your custom draw function into its native rendering loop, which is a great
+    performance improvement. Instead of forcing it to draw at specific
+    intervals and contending with the rest of the things a browser does, you
+    just request it to be placed in the queue, and the browser will get to it
+    as quickly as it can.</p><p>Because the <code>requestAnimationFrame</code> API is still
+    experimental, we need to use the prefixed version depending on user agent,
+    and fall back to a rough equivalent: <code>setTimeout</code>. The code for
+    this is as follows:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="nb">window</code><code class="p">.</code><code class="nx">requestAnimationFrame</code> <code class="o">=</code> <code class="p">(</code><code class="kd">function</code><code class="p">(){</code>
+<code class="k">return</code> <code class="nb">window</code><code class="p">.</code><code class="nx">requestAnimationFrame</code>  <code class="o">||</code>
+  <code class="nb">window</code><code class="p">.</code><code class="nx">webkitRequestAnimationFrame</code> <code class="o">||</code>
+  <code class="nb">window</code><code class="p">.</code><code class="nx">mozRequestAnimationFrame</code>    <code class="o">||</code>
+  <code class="nb">window</code><code class="p">.</code><code class="nx">oRequestAnimationFrame</code>      <code class="o">||</code>
+  <code class="nb">window</code><code class="p">.</code><code class="nx">msRequestAnimationFrame</code>     <code class="o">||</code>
+  <code class="kd">function</code><code class="p">(</code><code class="nx">callback</code><code class="p">){</code>
+  <code class="nb">window</code><code class="p">.</code><code class="nx">setTimeout</code><code class="p">(</code><code class="nx">callback</code><code class="p">,</code> <code class="mi">1000</code> <code class="o">/</code> <code class="mi">60</code><code class="p">);</code>
+<code class="p">};</code>
+<code class="p">})();</code></pre><p>Once we have this <code>requestAnimationFrame</code> function defined, we
+    should use it to query the analyzer node to give us detailed information
+    about the state of the audio stream.</p></section><section id="s05_3" data-type="sect1"><h1>Visualizing Sound</h1><p>Putting it all together, we can set up a render loop that queries
+    and renders the analyzer for its current frequency analysis as before,
+    into a <code>freqDomain</code> array:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">var</code> <code class="nx">freqDomain</code> <code class="o">=</code> <code class="k">new</code> <code class="nx">Uint8Array</code><code class="p">(</code><code class="nx">analyser</code><code class="p">.</code><code class="nx">frequencyBinCount</code><code class="p">);</code>
+<code class="nx">analyser</code><code class="p">.</code><code class="nx">getByteFrequencyData</code><code class="p">(</code><code class="nx">freqDomain</code><code class="p">);</code>
+<code class="k">for</code> <code class="p">(</code><code class="kd">var</code> <code class="nx">i</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code> <code class="nx">i</code> <code class="o">&lt;</code> <code class="nx">analyser</code><code class="p">.</code><code class="nx">frequencyBinCount</code><code class="p">;</code> <code class="nx">i</code><code class="o">++</code><code class="p">)</code> <code class="p">{</code>
+  <code class="kd">var</code> <code class="nx">value</code> <code class="o">=</code> <code class="nx">freqDomain</code><code class="p">[</code><code class="nx">i</code><code class="p">];</code>
+  <code class="kd">var</code> <code class="nx">percent</code> <code class="o">=</code> <code class="nx">value</code> <code class="o">/</code> <code class="mi">256</code><code class="p">;</code>
+  <code class="kd">var</code> <code class="nx">height</code> <code class="o">=</code> <code class="nx">HEIGHT</code> <code class="o">*</code> <code class="nx">percent</code><code class="p">;</code>
+  <code class="kd">var</code> <code class="nx">offset</code> <code class="o">=</code> <code class="nx">HEIGHT</code> <code class="o">-</code> <code class="nx">height</code> <code class="o">-</code> <code class="mi">1</code><code class="p">;</code>
+  <code class="kd">var</code> <code class="nx">barWidth</code> <code class="o">=</code> <code class="nx">WIDTH</code><code class="o">/</code><code class="nx">analyser</code><code class="p">.</code><code class="nx">frequencyBinCount</code><code class="p">;</code>
+  <code class="kd">var</code> <code class="nx">hue</code> <code class="o">=</code> <code class="nx">i</code><code class="o">/</code><code class="nx">analyser</code><code class="p">.</code><code class="nx">frequencyBinCount</code> <code class="o">*</code> <code class="mi">360</code><code class="p">;</code>
+  <code class="nx">drawContext</code><code class="p">.</code><code class="nx">fillStyle</code> <code class="o">=</code> <code class="s1">'hsl('</code> <code class="o">+</code> <code class="nx">hue</code> <code class="o">+</code> <code class="s1">', 100%, 50%)'</code><code class="p">;</code>
+  <code class="nx">drawContext</code><code class="p">.</code><code class="nx">fillRect</code><code class="p">(</code><code class="nx">i</code> <code class="o">*</code> <code class="nx">barWidth</code><code class="p">,</code> <code class="nx">offset</code><code class="p">,</code> <code class="nx">barWidth</code><code class="p">,</code> <code class="nx">height</code><code class="p">);</code>
+<code class="p">}</code></pre><p>We can do a similar thing for the time-domain data as well:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">var</code> <code class="nx">timeDomain</code> <code class="o">=</code> <code class="k">new</code> <code class="nx">Uint8Array</code><code class="p">(</code><code class="nx">analyser</code><code class="p">.</code><code class="nx">frequencyBinCount</code><code class="p">);</code>
+<code class="nx">analyser</code><code class="p">.</code><code class="nx">getByteTimeDomainData</code><code class="p">(</code><code class="nx">freqDomain</code><code class="p">);</code>
+<code class="k">for</code> <code class="p">(</code><code class="kd">var</code> <code class="nx">i</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code> <code class="nx">i</code> <code class="o">&lt;</code> <code class="nx">analyser</code><code class="p">.</code><code class="nx">frequencyBinCount</code><code class="p">;</code> <code class="nx">i</code><code class="o">++</code><code class="p">)</code> <code class="p">{</code>
+  <code class="kd">var</code> <code class="nx">value</code> <code class="o">=</code> <code class="nx">timeDomain</code><code class="p">[</code><code class="nx">i</code><code class="p">];</code>
+  <code class="kd">var</code> <code class="nx">percent</code> <code class="o">=</code> <code class="nx">value</code> <code class="o">/</code> <code class="mi">256</code><code class="p">;</code>
+  <code class="kd">var</code> <code class="nx">height</code> <code class="o">=</code> <code class="nx">HEIGHT</code> <code class="o">*</code> <code class="nx">percent</code><code class="p">;</code>
+  <code class="kd">var</code> <code class="nx">offset</code> <code class="o">=</code> <code class="nx">HEIGHT</code> <code class="o">-</code> <code class="nx">height</code> <code class="o">-</code> <code class="mi">1</code><code class="p">;</code>
+  <code class="kd">var</code> <code class="nx">barWidth</code> <code class="o">=</code> <code class="nx">WIDTH</code><code class="o">/</code><code class="nx">analyser</code><code class="p">.</code><code class="nx">frequencyBinCount</code><code class="p">;</code>
+  <code class="nx">drawContext</code><code class="p">.</code><code class="nx">fillStyle</code> <code class="o">=</code> <code class="s1">'black'</code><code class="p">;</code>
+  <code class="nx">drawContext</code><code class="p">.</code><code class="nx">fillRect</code><code class="p">(</code><code class="nx">i</code> <code class="o">*</code> <code class="nx">barWidth</code><code class="p">,</code> <code class="nx">offset</code><code class="p">,</code> <code class="mi">1</code><code class="p">,</code> <code class="mi">1</code><code class="p">);</code>
+<code class="p">}</code></pre><p>This code plots time-domain values using HTML5 canvas, creating a
+    simple visualizer that renders a graph of the waveform on top of the
+    colorful bar graph, which represents frequency-domain data. The result is
+    a canvas output that looks like <a href="#fig23" data-type="xref">Figure 5-2</a>, and changes with
+    time.</p><figure id="fig23" style="float: 0"><img src="images/waap_0502.png"><figcaption><span class="label">Figure 5-2. </span>A screenshot of a visualizer in action</figcaption></figure><p class="online_only">
+    {{jsbin width="100%" height="800px" src="http://orm-other.s3.amazonaws.com/webaudioapi/samples/visualizer/index.html"}}
+    </p><p>Our approach to visualization misses a lot of data. For music
+    visualization purposes, that’s fine. If, however, we want to perform a
+    comprehensive analysis of the whole audio buffer, we should look to other
+    methods.</p></section></section>
+  </body>
+</html>

@@ -1,0 +1,67 @@
+@charset "UTF-8";
+
+@import "DYNAMIC CSS PLACEHOLDER";
+
+/*--------Put Your Custom CSS Rules Below--------*/
+
+/*----Uncomment to turn on automatic code wrapping----*/
+
+pre.programlisting, pre.screen, pre.literallayout {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/*---New styling for <sidebar role="theory"> per AU---*/
+
+div.sidebar.theory div.sidebar-title:before {
+  content: "CRITICAL THEORY";
+  font-family: "MyriadPro-SemiboldCond";
+  font-size: 14pt;
+  margin-bottom: 5pt;
+  text-align: center;
+  color: cmyk(0%,0%,0%,100%);
+  display: block;
+  text-decoration: underline;
+  page-break-before: avoid;
+  page-break-after: avoid;
+}
+
+div.sidebar.theory div.mediaobject {
+  border: none;
+}
+
+/*----Uncomment to fix a bad break in the title 
+      (increase padding value to push down, decrease 
+      value to pull up)
+
+div.book div.booktitlepage h1.title {
+  padding-left: 1.5in;
+}
+----*/
+
+/*----Uncomment to fix a bad break in the subtitle
+      (increase padding value to push down, decrease
+      value to pull up)
+
+div.book div.booktitlepage h2.subtitle {
+  padding-left: 1in;
+----*/
+
+
+/*----Uncomment to fix a bad break in the author names 
+      (increase padding value to push down, decrease 
+      value to pull up)
+
+p.titlepageauthor {
+  padding-left: 3in;
+}
+----*/
+
+
+/*----Uncomment to suuppress colophon, show only 
+      "About the Authors"
+
+div.colophon {
+  display: none;
+}
+----*/

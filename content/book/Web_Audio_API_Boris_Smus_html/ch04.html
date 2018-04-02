@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Web Audio API</title>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"> </script>
+    <link rel="stylesheet" type="text/css" href="theme/html/html.css">
+  </head>
+  <body data-type="book">
+    <section xmlns="http://www.w3.org/1999/xhtml" id="ch04" data-type="chapter"><h1>Pitch and the Frequency Domain</h1><p>So far we have learned about some basic properties of sound: timing
+  and volume. To do more complex things, such as sound equalization (e.g.,
+  increasing the bass and decreasing the treble), we need more complex tools.
+  This section explains some of the tools that allow you to do these more
+  interesting transformations, which include the ability to simulate different
+  sorts of environments and manipulate sounds directly with JavaScript.</p><aside id="s04_1" class="theory" data-type="sidebar"><h5>Basics of Musical Pitch</h5><p>Music consists of many sounds played simultaneously. Sounds produced
+    by musical instruments can be very complex, as the sound bounces through
+    various parts of the instrument and is shaped in unique ways. However,
+    these musical tones all have one thing in common: physically, they are
+    periodic waveforms. This periodicity is perceived by our ears as pitch.
+    The pitch of a note is measured in frequency, or the number of times the
+    wave pattern repeats every second, specified in
+    <em>hertz</em>. The frequency is the time (in seconds) between
+    the crests of the wave. As illustrated in <a href="#fig18" data-type="xref">Figure 4-1</a>, if we
+    halve the wave in the time dimension, we end up with a correspondingly
+    doubled frequency, which sounds to our ears like the same tone, one octave
+    higher. Conversely, if we extend the wave’s frequency by two, this brings
+    the tone an octave down. Thus, pitch (like volume) is perceived
+    exponentially by our ears: at every octave, the frequency doubles.</p><figure id="fig18" style="float: 0"><img src="images/waap_0401.png"><figcaption><span class="label">Figure 4-1. </span>Graph of perfect A4 and A5 tones side by side</figcaption></figure><p>Octaves are split up into 12 semitones. Each adjacent semitone pair
+    has an identical frequency ratio (at least in equal-tempered tunings). In
+    other words, the ratios of the frequencies of A4 to A#4 are identical to
+    A#4 to B.</p><p><a href="#fig18" data-type="xref">Figure 4-1</a> shows how we would derive the ratio between
+    every successive semitone, given that:</p><ol><li><p>To transpose a note up an octave, we double the frequency of the
+        note.</p></li><li><p>Each octave is split up into 12 semitones, which, in an equal
+        tempered tuning, have identical frequency ratios.</p></li></ol><p>Let's define a <span data-type="tex">$f_0$</span> to be some frequency, and <span data-type="tex">$f_1$</span> to be that same note one octave higher. we know that
+    this is the relationship between them:</p><div data-type="equation" id="id-VEUdtkfk"><p data-type="tex">\begin{equation} {f_1 = 2 * f_0}
+      \end{equation}</p></div><p>Next, let <em>k</em> be the fixed multiplier between any
+    two adjacent semitones. Since there are 12 semitones in an octave, we also
+    know the following:</p><div data-type="equation" id="id-KAUwU0fw"><p data-type="tex">\begin{equation} {f_1 = f_0 * k*k*k*...*k (12x) =
+      f_0 * k^{12}} \end{equation}</p></div><p>Solving the system of equations above, we have the following:</p><div data-type="equation" id="id-d3UOsXfl"><p data-type="tex">\begin{equation} {2 * f_0 = f_0 * k^{12}}
+      \end{equation}</p></div><p>Solving for <em>k</em>:</p><div data-type="equation" id="id-8PUVinfr"><p data-type="tex">\begin{equation} {k = 2^{(1/12)} ~= 1.0595...}
+      \end{equation}</p></div><p>Conveniently, all of this semitone-related offsetting isn’t really
+    necessary to do manually, since many audio environments (the Web Audio API
+    included) include a notion of detune, which linearizes the frequency
+    domain. Detune is measured in <em>cents</em>, with each octave
+    consisting of 1200 cents, and each semitone consisting of 100 cents. By
+    specifying a detune of 1200, you move up an octave. Specifying a detune of
+    −1200 moves you down an octave.</p></aside><section id="s04_2" data-type="sect1"><h1>Pitch and playbackRate</h1><p>The Web Audio API provides a <code>playbackRate</code> parameter on
+    each <code>AudioSourceNode</code>. This value can be set to affect
+    the pitch of any sound buffer. Note that the pitch as well as the duration
+    of the sample will be affected in this case. There are sophisticated
+    methods that try to affect pitch independent of duration, but this is
+    quite difficult to do in a general-purpose way without introducing blips,
+    scratches, and other undesirable artifacts to the mix.</p><p>As discussed in <a href="#s04_1" data-type="xref">Basics of Musical Pitch</a>, to compute the frequencies
+    of successive semitones, we simply multiply the frequency by the semitone
+    ratio 2<sup>1/12</sup>. This is very useful if you are
+    developing a musical instrument or using pitch for randomization in a game
+    setting. The following code plays a tone at a given frequency offset in
+    <span class="keep-together">semitones</span>:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">function</code> <code class="nx">playNote</code><code class="p">(</code><code class="nx">semitones</code><code class="p">)</code> <code class="p">{</code>
+  <code class="c1">// Assume a new source was created from a buffer.</code>
+  <code class="kd">var</code> <code class="nx">semitoneRatio</code> <code class="o">=</code> <code class="nb">Math</code><code class="p">.</code><code class="nx">pow</code><code class="p">(</code><code class="mi">2</code><code class="p">,</code> <code class="mi">1</code><code class="o">/</code><code class="mi">12</code><code class="p">);</code>
+  <code class="nx">source</code><code class="p">.</code><code class="nx">playbackRate</code><code class="p">.</code><code class="nx">value</code> <code class="o">=</code> <code class="nb">Math</code><code class="p">.</code><code class="nx">pow</code><code class="p">(</code><code class="nx">semitoneRatio</code><code class="p">,</code> <code class="nx">semitones</code><code class="p">);</code>
+  <code class="nx">source</code><code class="p">.</code><code class="nx">start</code><code class="p">(</code><code class="mi">0</code><code class="p">);</code>
+<code class="p">}</code></pre><p>As we discussed earlier, our ears perceive pitch exponentially.
+    Treating pitch as an exponential quantity can be inconvenient, since we
+    often deal with awkward values such as the twelfth root of two. Instead of
+    doing that, we can use the detune parameter to specify our offset in
+    cents. Thus you can rewrite the above function using detune in an easier
+    way:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">function</code> <code class="nx">playNote</code><code class="p">(</code><code class="nx">semitones</code><code class="p">)</code> <code class="p">{</code>
+  <code class="c1">// Assume a new source was created from a buffer.</code>
+  <code class="nx">source</code><code class="p">.</code><code class="nx">detune</code><code class="p">.</code><code class="nx">value</code> <code class="o">=</code> <code class="nx">semitones</code> <code class="o">*</code> <code class="mi">100</code><code class="p">;</code>
+  <code class="nx">source</code><code class="p">.</code><code class="nx">start</code><code class="p">(</code><code class="mi">0</code><code class="p">);</code>
+<code class="p">}</code></pre><p>If you pitch shift by too many semitones (e.g., by calling
+    <code>playNote(24);</code>), you will start to hear distortions. Because
+    of this, digital pianos include multiple samples for each instrument. Good
+    digital pianos avoid pitch bending at all, and include a separate sample
+    recorded specifically for each key. Great digital pianos often include
+    multiple samples for each key, which are played back depending on the
+    velocity of the key press.</p></section><section id="s04_3" data-type="sect1"><h1>Multiple Sounds with Variations</h1><p>A key feature of sound effects in games is that there can be many of
+    them simultaneously. Imagine you’re in the middle of a gunfight with
+    multiple actors shooting machine guns. Each machine gun fires many times
+    per second, causing tens of sound effects to be played at the same time.
+    Playing back sound from multiple, precisely-timed sources simultaneously
+    is one place the Web Audio API really shines.</p><p>Now, if all of the machine guns in your game sounded exactly the
+    same, that would be pretty boring. Of course the sound would vary based on
+    distance from the target and relative position [more on this later in
+    <a href="ch06.html#s06_5" data-type="xref">Spatialized Sound</a>], but even that might not be enough. Luckily the
+    Web Audio API provides a way to easily tweak the previous example in at
+    least two simple ways:</p><ol><li><p>With a subtle shift in time between bullets firing</p></li><li><p>By changing pitch to better simulate the randomness of the real
+        world</p></li></ol><p>Using our knowledge of timing and pitch, implementing these two
+    effects is pretty straightforward:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">function</code> <code class="nx">shootRound</code><code class="p">(</code><code class="nx">numberOfRounds</code><code class="p">,</code> <code class="nx">timeBetweenRounds</code><code class="p">)</code> <code class="p">{</code>
+  <code class="kd">var</code> <code class="nx">time</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">currentTime</code><code class="p">;</code>
+  <code class="c1">// Make multiple sources using the same buffer and play in quick succession.</code>
+  <code class="k">for</code> <code class="p">(</code><code class="kd">var</code> <code class="nx">i</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code> <code class="nx">i</code> <code class="o">&lt;</code> <code class="nx">numberOfRounds</code><code class="p">;</code> <code class="nx">i</code><code class="o">++</code><code class="p">)</code> <code class="p">{</code>
+    <code class="kd">var</code> <code class="nx">source</code> <code class="o">=</code> <code class="k">this</code><code class="p">.</code><code class="nx">makeSource</code><code class="p">(</code><code class="nx">bulletBuffer</code><code class="p">);</code>
+    <code class="nx">source</code><code class="p">.</code><code class="nx">playbackRate</code><code class="p">.</code><code class="nx">value</code> <code class="o">=</code> <code class="mi">1</code> <code class="o">+</code> <code class="nb">Math</code><code class="p">.</code><code class="nx">random</code><code class="p">()</code> <code class="o">*</code> <code class="nx">RANDOM_PLAYBACK</code><code class="p">;</code>
+    <code class="nx">source</code><code class="p">.</code><code class="nx">start</code><code class="p">(</code><code class="nx">time</code> <code class="o">+</code> <code class="nx">i</code> <code class="o">*</code> <code class="nx">timeBetweenRounds</code> <code class="o">+</code> <code class="nb">Math</code><code class="p">.</code><code class="nx">random</code><code class="p">()</code> <code class="o">*</code> <code class="nx">RANDOM_VOLUME</code><code class="p">);</code>
+  <code class="p">}</code>
+<code class="p">}</code></pre><p>The Web Audio API automatically merges multiple sounds playing at
+    once, essentially just adding the waveforms together. This can cause
+    problems such as clipping, which we discuss in <a href="ch03.html#s03_3" data-type="xref">Clipping and Metering</a>.</p><p>This example adds some variety to <code>AudioBuffers</code> loaded
+    from sound files. In some cases, it is desirable to have fully synthesized
+    sound effects and no buffers at all [see <a href="ch06.html#s06_3" data-type="xref">Procedurally Generated Sound</a>].</p><p class="online_only">
+    {{jsbin width="100%" height="380px" src="http://orm-other.s3.amazonaws.com/webaudioapi/samples/rapid-sounds/index.html"}}
+    </p><aside id="s04_4" class="theory" data-type="sidebar"><h5>Understanding the Frequency Domain</h5><p>So far in our theoretical excursions, we’ve only examined sound as
+      a function of pressure as it varies over time. Another useful way of
+      looking at sound is to plot amplitude and see how it varies over
+      frequency. This results in graphs where the domain (x-axis) is in units
+      of frequency (Hz). Graphs of sound plotted this way are said to be in
+      the <em>frequency domain</em>.</p><p>The relationship between the time-domain and frequency-domain
+      graphs is based on the idea of <em>fourier
+      decomposition</em>. As we saw earlier, sound waves are often
+      cyclical in nature. Mathematically, periodic sound waves can be seen as
+      the sum of multiple simple sine waves of different frequency and
+      amplitude. The more such sine waves we add together, the better an
+      approximation of the original function we can get. We can take a signal
+      and find its component sine waves by applying a fourier transformation,
+      the details of which are outside the scope of this book. Many algorithms
+      exist to get this decomposition too, the best known of which is the Fast
+      Fourier Transform (FFT). Luckily, the Web Audio API comes with an
+      implementation of this algorithm. We will discuss how it works later
+      [see <a href="ch05.html#s05_1" data-type="xref">Frequency Analysis</a>].</p><p>In general, we can take a sound wave, figure out the constituent
+      sine wave breakdown, and plot the (frequency, amplitude) as points on a
+      new graph to get a frequency domain plot. <a href="#fig19" data-type="xref">Figure 4-2</a> shows
+      a pure A note at 440 Hz (called A4).</p><figure id="fig19" style="float: 0"><img src="images/waap_0402.png"><figcaption><span class="label">Figure 4-2. </span>A perfectly sinusoidal 1-KHz sound wave represented in both
+        time and frequency domains</figcaption></figure><p>Looking at the frequency domain can give a better sense of the
+      qualities of the sound, including pitch content, amount of noise, and
+      much more. Advanced algorithms like pitch detection can be built on top
+      of the frequency domain. Sound produced by real musical instruments have
+      overtones, so an A4 played by a piano has a frequency domain plot that
+      looks (and sounds) very different from the same A4 pitch played by a
+      trumpet. Regardless of the complexity of sounds, the same fourier
+      decomposition ideas apply. <a href="#fig20" data-type="xref">Figure 4-3</a> shows a more complex
+      fragment of a sound in both the time and frequency domains.</p><figure id="fig20" style="float: 0"><img src="images/waap_0403.png"><figcaption><span class="label">Figure 4-3. </span>A complex sound wave shown in both time and frequency
+        domains</figcaption></figure><p>These graphs behave quite differently over time. If you were to
+      very slowly play back the sound in <a href="#fig20" data-type="xref">Figure 4-3</a> and observe
+      it moving along each graph, you would notice the time domain graph (on
+      the left) progressing left to right. The frequency domain graph (on the
+      right) is the frequency analysis of the waveform at a moment in time, so
+      it might change more quickly and less predictably.</p><p>Importantly, frequency-domain analysis is still useful when the
+      sound examined is not perceived as having a specific pitch. Wind,
+      percussive sources, and gunshots have distinct representations in the
+      frequency domain. For example, white noise has a flat frequency domain
+      spectrum, since each frequency is equally represented.</p></aside></section><section id="s04_5" data-type="sect1"><h1>Oscillator-Based Direct Sound Synthesis</h1><p>As we discussed early in this book, digital sound in the Web Audio
+    API is represented as an array of floats in <code>AudioBuffers</code>.
+    Most of the time, the buffer is created by loading a sound file, or on the
+    fly from some sound stream. In some cases, we might want to synthesize our
+    own sounds. We can do this by creating audio buffers programmatically
+    using JavaScript, which simply evaluate a mathematical function at regular
+    periods and assign values to an array. By taking this approach, we can
+    manually change the amplitude and frequency of our sine wave, or even
+    concatenate multiple sine waves together to create arbitrary sounds
+    [recall the principles of fourier transformations from <a href="#s04_4" data-type="xref">Understanding the Frequency Domain</a>].</p><p>Though possible, doing this work in JavaScript is inefficient and
+    complex. Instead, the Web Audio API provides primitives that let you do
+    this with oscillators: <code>OscillatorNode</code>. These nodes have
+    configurable frequency and detune [see the <a href="#s04_1" data-type="xref">Basics of Musical Pitch</a>]. They
+    also have a type that represents the kind of wave to generate. Built-in
+    types include the sine, triangle, sawtooth, and square waves, as shown in
+    <a href="#fig21" data-type="xref">Figure 4-4</a>.</p><figure id="fig21" style="float: 0"><img src="images/waap_0404.png"><figcaption><span class="label">Figure 4-4. </span>Types of basic soundwave shapes that the oscillator can
+      generate</figcaption></figure><p>Oscillators can easily be used in audio graphs in place of
+    <code>AudioBufferSourceNodes</code>. An example of this follows:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">function</code> <code class="nx">play</code><code class="p">(</code><code class="nx">semitone</code><code class="p">)</code> <code class="p">{</code>
+  <code class="c1">// Create some sweet sweet nodes.</code>
+  <code class="kd">var</code> <code class="nx">oscillator</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createOscillator</code><code class="p">();</code>
+  <code class="nx">oscillator</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">context</code><code class="p">.</code><code class="nx">destination</code><code class="p">);</code>
+  <code class="c1">// Play a sine type curve at A4 frequency (440hz).</code>
+  <code class="nx">oscillator</code><code class="p">.</code><code class="nx">frequency</code><code class="p">.</code><code class="nx">value</code> <code class="o">=</code> <code class="mi">440</code><code class="p">;</code>
+  <code class="nx">oscillator</code><code class="p">.</code><code class="nx">detune</code><code class="p">.</code><code class="nx">value</code> <code class="o">=</code> <code class="nx">semitone</code> <code class="o">*</code> <code class="mi">100</code><code class="p">;</code>
+  <code class="c1">// Note: this constant will be replaced with "sine".</code>
+  <code class="nx">oscillator</code><code class="p">.</code><code class="nx">type</code> <code class="o">=</code> <code class="nx">oscillator</code><code class="p">.</code><code class="nx">SINE</code><code class="p">;</code>
+  <code class="nx">oscillator</code><code class="p">.</code><code class="nx">start</code><code class="p">(</code><code class="mi">0</code><code class="p">);</code>
+<code class="p">}</code></pre><p class="online_only">
+    <?jsbin width="100%" height="598px" src="http://orm-other.s3.amazonaws.com/webaudioapi/samples/oscillator/index.html"?>
+    </p><p>In addition to these basic wave types, you can create a custom wave
+    table for your oscillator by using harmonic tables. This lets you
+    efficiently create wave shapes that are much more complex than the
+    previous ones. This topic is very important for musical synthesis
+    applications, but is outside of the scope of this book.</p></section></section>
+  </body>
+</html>

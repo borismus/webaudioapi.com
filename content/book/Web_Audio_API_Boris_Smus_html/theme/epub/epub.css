@@ -1,0 +1,6 @@
+/* Add your custom CSS styles for the EPUB here */
+
+aside[data-type="sidebar"].theory h5:before {
+  content: "THEORY: ";
+  display: inline;
+}

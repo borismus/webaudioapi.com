@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Web Audio API</title>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"> </script>
+    <link rel="stylesheet" type="text/css" href="theme/html/html.css">
+  </head>
+  <body data-type="book">
+    <section xmlns="http://www.w3.org/1999/xhtml" id="ch03" data-type="chapter"><h1>Volume and Loudness</h1><p>Once we are ready to play a sound, whether from an
+  <code>AudioBuffer</code> or from other sources, one of the most basic
+  parameters we can change is the loudness of the sound.</p><p>The main way to affect the loudness of a sound is using
+  <code>GainNodes</code>. As previously mentioned, these nodes have a gain
+  parameter, which acts as a multiplier on the incoming sound buffer. The
+  default gain value is one, which means that the input sound is unaffected.
+  Values between zero and one reduce the loudness, and values greater than one
+  amplify the loudness. Negative gain (values less than zero) inverts the
+  waveform (i.e., the amplitude is flipped).</p><aside id="s03_1" class="theory" data-type="sidebar"><h5>Volume, Gain, and Loudness</h5><p>Let’s start with some definitions. <em>Loudness</em> is
+    a subjective measure of how intensely our ears perceive a sound.
+    <em>Volume</em> is a measure of the physical amplitude of a
+    sound wave. <em>Gain</em> is a scale multiplier affecting a
+    sound’s amplitude as it is being processed.</p><p>In other words, when undergoing a gain, the amplitude of a sound
+    wave is scaled, with the gain value used as a multiplier. For example,
+    while a gain value of one will not affect the sound wave at all, <a href="#fig11" data-type="xref">Figure 3-1</a> illustrates what happens to a sound wave if you send it
+    through a gain factor of two.</p><figure id="fig11" style="float: 0"><img src="images/waap_0301.png"><figcaption><span class="label">Figure 3-1. </span>Original soundform on the left, gain 2 soundform on the
+      right</figcaption></figure><p>Generally speaking, power in a wave is measured in decibels
+    (abbreviated dB), or one tenth of a Bel, named after Alexander Graham
+    Bell. Decibels are a relative, logarithmic unit that compare the level
+    being measured to some reference point. There are many different reference
+    points for measuring dB, and each reference point is indicated with a
+    suffix on the unit. Saying that a signal is some number of dB is
+    meaningless without a reference point! For example, dBV, dBu, and dBm are
+    all useful for measuring electrical signals. Since we are dealing with
+    digital audio, we are mainly concerned with two measures: dBFS and
+    dBSPL.</p><p>The first is <em>dBFS</em>, or decibels full scale. The
+    highest possible level of sound produced by audio equipment is 0 dBFS. All
+    other levels are expressed in negative numbers.</p><p>dBFS is described mathematically as:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="nx">dBFS</code> <code class="o">=</code> <code class="mi">20</code> <code class="o">*</code> <code class="nx">log</code><code class="p">(</code> <code class="p">[</code><code class="nx">sample</code> <code class="nx">level</code><code class="p">]</code> <code class="o">/</code> <code class="p">[</code><code class="nx">max</code> <code class="nx">level</code><code class="p">]</code> <code class="p">)</code></pre><p>The maximum dBFS value in a 16-bit audio system is:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="nx">max</code> <code class="o">=</code> <code class="mi">20</code> <code class="o">*</code> <code class="nx">log</code><code class="p">(</code><code class="mi">1111</code> <code class="mi">1111</code> <code class="mi">1111</code> <code class="mi">1111</code><code class="o">/</code><code class="mi">1111</code> <code class="mi">1111</code> <code class="mi">1111</code> <code class="mi">1111</code><code class="p">)</code> <code class="o">=</code> <code class="nx">log</code><code class="p">(</code><code class="mi">1</code><code class="p">)</code> <code class="o">=</code> <code class="mi">0</code></pre><p>Note that the maximum dBFS value will always be 0 by definition,
+    since log(1) = 0. Similarly, the minimum dBFS value in the same system
+    is:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="nx">min</code> <code class="o">=</code> <code class="mi">20</code> <code class="o">*</code> <code class="nx">log</code><code class="p">(</code><code class="mi">0000</code> <code class="mi">0000</code> <code class="mi">0000</code> <code class="mi">0001</code><code class="o">/</code><code class="mi">1111</code> <code class="mi">1111</code> <code class="mi">1111</code> <code class="mi">1111</code><code class="p">)</code> <code class="o">=</code> <code class="o">-</code><code class="mi">96</code> <code class="nx">dBFS</code></pre><p>dBFS is a measure of gain, not volume. You can play a 0-dBFS signal
+    through your stereo with the stereo gain set very low and hardly be able
+    to hear anything. Conversely, you can play a −30-dBFS signal with the
+    stereo gain maxed and blow your eardrums away.</p><p>That said, you’ve probably heard someone describe the volume of a
+    sound in decibels. Technically speaking, they were referring to
+    <em>dBSPL</em>, or decibels relative to sound pressure level.
+    Here, the reference point is 0.000002 newtons per square meter (roughly
+    the sound of a mosquito flying 3 m away). There is no upper value to
+    dBSPL, but in practice, we want to stay below levels of ear damage (~120
+    dBSPL) and well below the threshold of pain (~150 dBSPL). The Web Audio
+    API does not use dBSPL, since the final volume of the sound depends on the
+    OS gain and the speaker gain, and only deals with dBFS.</p><p>The logarithmic definition of decibels correlates somewhat to the
+    way our ears perceive loudness, but loudness is still a very subjective
+    concept. Comparing the dB values of a sound and the same sound with a 2x
+    gain, we can see that we’ve gained about 6 dB:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="nx">diff</code> <code class="o">=</code> <code class="mi">20</code> <code class="o">*</code> <code class="nx">log</code><code class="p">(</code><code class="mi">2</code><code class="o">/</code><code class="mi">2</code><code class="o">^</code><code class="mi">16</code><code class="p">)</code> <code class="o">-</code> <code class="mi">20</code> <code class="o">*</code> <code class="nx">log</code><code class="p">(</code><code class="mi">1</code><code class="o">/</code><code class="mi">2</code><code class="o">^</code><code class="mi">16</code><code class="p">)</code> <code class="o">=</code> <code class="mf">6.02</code> <code class="nx">dB</code></pre><p>Every time we add 6 dB or so, we actually double the amplitude of
+    the signal. Comparing the sound at a rock concert (~110 dBSPL) to your
+    alarm clock (~80 dBSPL), the difference between the two is (110 − 80)/6
+    dB, or roughly 5 times louder, with a gain multiplier of
+    2<sup>5</sup> = 32x. A volume knob on a stereo is
+    therefore also calibrated to increase the amplitude exponentially. In
+    other words, turning the volume knob by 3 units multiplies the amplitude
+    of the signal roughly by a factor of 2<sup>3</sup> or 8
+    times. In practice, the exponential model described here is merely an
+    approximation to the way our ears perceive loudness, and audio equipment
+    manufacturers often have their own custom gain curves that are neither
+    linear nor exponential.</p></aside><section id="s03_2" data-type="sect1"><h1>Equal Power Crossfading</h1><p>Often in a game setting, you have a situation where you want to
+    crossfade between two environments that have different sounds associated
+    with them. However, when to crossfade and by how much is not known in
+    advance; perhaps it varies with the position of the game avatar, which is
+    controlled by the player. In this case, we cannot do an automatic
+    ramp.</p><p>In general, doing a straightforward, linear fade will result in the
+    following graph. It can sound unbalanced because of a volume dip between
+    the two samples, as shown in <a href="#fig12" data-type="xref">Figure 3-2</a>.</p><figure id="fig12" style="float: 0"><img src="images/waap_0302.png"><figcaption><span class="label">Figure 3-2. </span>A linear crossfade between two tracks</figcaption></figure><p>To address this issue, we use an equal power curve, in which the
+    corresponding gain curves are neither linear nor exponential, and
+    intersect at a higher amplitude (<a href="#fig13" data-type="xref">Figure 3-3</a>). This helps
+    avoid a dip in volume in the middle part of the crossfade, when both
+    sounds are mixed together equally.</p><figure id="fig13" style="float: 0"><img src="images/waap_0303.png"><figcaption><span class="label">Figure 3-3. </span>An equal power crossfade sounds much better</figcaption></figure><p>The graph in <a href="#fig13" data-type="xref">Figure 3-3</a> can be generated with a bit of
+    math:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">function</code> <code class="nx">equalPowerCrossfade</code><code class="p">(</code><code class="nx">percent</code><code class="p">)</code> <code class="p">{</code>
+  <code class="c1">// Use an equal-power crossfading curve:</code>
+  <code class="kd">var</code> <code class="nx">gain1</code> <code class="o">=</code> <code class="nb">Math</code><code class="p">.</code><code class="nx">cos</code><code class="p">(</code><code class="nx">percent</code> <code class="o">*</code> <code class="mf">0.5</code><code class="o">*</code><code class="nb">Math</code><code class="p">.</code><code class="nx">PI</code><code class="p">);</code>
+  <code class="kd">var</code> <code class="nx">gain2</code> <code class="o">=</code> <code class="nb">Math</code><code class="p">.</code><code class="nx">cos</code><code class="p">((</code><code class="mf">1.0</code> <code class="o">-</code> <code class="nx">percent</code><code class="p">)</code> <code class="o">*</code> <code class="mf">0.5</code><code class="o">*</code><code class="nb">Math</code><code class="p">.</code><code class="nx">PI</code><code class="p">);</code>
+  <code class="k">this</code><code class="p">.</code><code class="nx">ctl1</code><code class="p">.</code><code class="nx">gainNode</code><code class="p">.</code><code class="nx">gain</code><code class="p">.</code><code class="nx">value</code> <code class="o">=</code> <code class="nx">gain1</code><code class="p">;</code>
+  <code class="k">this</code><code class="p">.</code><code class="nx">ctl2</code><code class="p">.</code><code class="nx">gainNode</code><code class="p">.</code><code class="nx">gain</code><code class="p">.</code><code class="nx">value</code> <code class="o">=</code> <code class="nx">gain2</code><code class="p">;</code>
+<code class="p">}</code></pre><p class="online_only">
+    {{jsbin width="100%" height="293px" src="http://orm-other.s3.amazonaws.com/webaudioapi/samples/crossfade/index.html"}}
+    </p><aside id="s03_3" class="theory" data-type="sidebar"><h5>Clipping and Metering</h5><p>Like images exceeding the boundaries of a canvas, sounds can also
+      be clipped if the waveform exceeds its maximum level. The distinct
+      distortion that this produces is obviously undesirable. Audio equipment
+      often has indicators that show the magnitude of audio levels to help
+      engineers and listeners produce output that does not clip. These
+      indicators are called meters (<a href="#fig14" data-type="xref">Figure 3-4</a>) and often have a
+      green zone (no clipping), yellow zone (close to clipping), and red zone
+      (clipping).</p><figure id="fig14" style="float: 0"><img src="images/waap_0304.png"><figcaption><span class="label">Figure 3-4. </span>A meter in a typical receiver</figcaption></figure><p>Clipped sound looks bad on a monitor and sounds no better. It’s
+      important to listen for harsh distortions, or conversely, overly subdued
+      mixes that force your listeners to crank up the volume. If you’re in
+      either of these situations, read on!</p></aside></section><section id="s03_4" data-type="sect1"><h1>Using Meters to Detect and Prevent Clipping</h1><p>Since multiple sounds playing simultaneously are additive with no
+    level reduction, you may find yourself in a situation where you are
+    exceeding past the threshold of your speaker’s capability. The maximum
+    level of sound is 0 dBFS, or 2<sup>16</sup>, for 16-bit
+    audio. In the floating point version of the signal, these bit values are
+    mapped to [−1, 1]. The waveform of a sound that’s being clipped looks
+    something like <a href="#fig15" data-type="xref">Figure 3-5</a>. In the context of the Web Audio
+    API, sounds clip if the values sent to the destination node lie outside of
+    the range. It’s a good idea to leave some room (called
+    <em>headroom</em>) in your final mix so that you aren’t too
+    close to the clipping threshold.</p><figure id="fig15" style="float: 0"><img src="images/waap_0305.png"><figcaption><span class="label">Figure 3-5. </span>A diagram of a waveform being clipped</figcaption></figure><p>In addition to close listening, you can check whether or not you are
+    clipping your sound programmatically by putting a script processor node
+    into your audio graph. Clipping may occur if any of the PCM values are out
+    of the acceptable range. In this sample, we check both left and right
+    channels for clipping, and if clipping is detected, save the last clipping
+    time:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">function</code> <code class="nx">onProcess</code><code class="p">(</code><code class="nx">e</code><code class="p">)</code> <code class="p">{</code>
+  <code class="kd">var</code> <code class="nx">leftBuffer</code> <code class="o">=</code> <code class="nx">e</code><code class="p">.</code><code class="nx">inputBuffer</code><code class="p">.</code><code class="nx">getChannelData</code><code class="p">(</code><code class="mi">0</code><code class="p">);</code>
+  <code class="kd">var</code> <code class="nx">rightBuffer</code> <code class="o">=</code> <code class="nx">e</code><code class="p">.</code><code class="nx">inputBuffer</code><code class="p">.</code><code class="nx">getChannelData</code><code class="p">(</code><code class="mi">1</code><code class="p">);</code>
+  <code class="nx">checkClipping</code><code class="p">(</code><code class="nx">leftBuffer</code><code class="p">);</code>
+  <code class="nx">checkClipping</code><code class="p">(</code><code class="nx">rightBuffer</code><code class="p">);</code>
+<code class="p">}</code>
+
+<code class="kd">function</code> <code class="nx">checkClipping</code><code class="p">(</code><code class="nx">buffer</code><code class="p">)</code> <code class="p">{</code>
+  <code class="kd">var</code> <code class="nx">isClipping</code> <code class="o">=</code> <code class="kc">false</code><code class="p">;</code>
+  <code class="c1">// Iterate through buffer to check if any of the |values| exceeds 1.</code>
+  <code class="k">for</code> <code class="p">(</code><code class="kd">var</code> <code class="nx">i</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code> <code class="nx">i</code> <code class="o">&lt;</code> <code class="nx">buffer</code><code class="p">.</code><code class="nx">length</code><code class="p">;</code> <code class="nx">i</code><code class="o">++</code><code class="p">)</code> <code class="p">{</code>
+    <code class="kd">var</code> <code class="nx">absValue</code> <code class="o">=</code> <code class="nb">Math</code><code class="p">.</code><code class="nx">abs</code><code class="p">(</code><code class="nx">buffer</code><code class="p">[</code><code class="nx">i</code><code class="p">]);</code>
+    <code class="k">if</code> <code class="p">(</code><code class="nx">absValue</code> <code class="o">&gt;=</code> <code class="mf">1.0</code><code class="p">)</code> <code class="p">{</code>
+      <code class="nx">isClipping</code> <code class="o">=</code> <code class="kc">true</code><code class="p">;</code>
+      <code class="k">break</code><code class="p">;</code>
+    <code class="p">}</code>
+  <code class="p">}</code>
+  <code class="k">this</code><code class="p">.</code><code class="nx">isClipping</code> <code class="o">=</code> <code class="nx">isClipping</code><code class="p">;</code>
+  <code class="k">if</code> <code class="p">(</code><code class="nx">isClipping</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nx">lastClipTime</code> <code class="o">=</code> <code class="k">new</code> <code class="nb">Date</code><code class="p">();</code>
+  <code class="p">}</code>
+<code class="p">}</code></pre><p>An alternative implementation of metering could poll a real-time
+    analyzer in the audio graph for <code>getFloatFrequencyData</code> at
+    render time, as determined by <code>requestAnimationFrame</code> (see
+    <a href="ch05.html#ch05" data-type="xref">Analysis and Visualization</a>). This approach is more efficient, but misses a
+    lot of the signal (including places where it potentially clips), since
+    rendering happens most at 60 times a second, whereas the audio signal
+    changes far more quickly.</p><p>The way to prevent clipping is to reduce the overall level of the
+    signal. If you are clipping, apply some fractional gain on a master audio
+    gain node to subdue your mix to a level that prevents clipping. In
+    general, you should tweak gains to anticipate the worst case, but getting
+    this right is more of an art than a science. In practice, since the sounds
+    playing in your game or interactive application may depend on a huge
+    variety of factors that are decided at runtime, it can be difficult to
+    pick the master gain value that prevents clipping in all cases. For this
+    unpredictable case, look to dynamics compression, which is discussed in
+    <a href="#s03_6" data-type="xref">Dynamics Compression</a>.</p><p class="online_only">
+    <?jsbin width="100%" height="297px" src="http://orm-other.s3.amazonaws.com/webaudioapi/samples/metering/index.html"?>
+    </p><aside id="s03_5" class="theory" data-type="sidebar"><h5>Understanding Dynamic Range</h5><p>In audio, <em>dynamic range</em> refers to the
+      difference between the loudest and quietest parts of a sound. The amount
+      of dynamic range in musical pieces varies greatly depending on genre.
+      Classical music has large dynamic range and often features very quiet
+      sections followed by relatively loud ones. Many popular genres like rock
+      and electronica tend to have a small dynamic range, and are uniformly
+      loud because of an apparent competition (known pejoratively as the
+      “Loudness War”) to increase the loudness of tracks to meet consumer
+      demands. This uniform loudness is generally achieved by using dynamic
+      range compression.</p><p>That said, there are many legitimate uses of compression.
+      Sometimes recorded music has such a large dynamic range that there are
+      sections that sound so quiet or loud that the listener constantly needs
+      to have a finger on the volume knob. Compression can quiet down the loud
+      parts while making the quiet parts audible. <a href="#fig16" data-type="xref">Figure 3-6</a>
+      illustrates a waveform (above), and then the same waveform with
+      compression applied (below). You can see that the sound is louder
+      overall, and there is less variance in the amplitude.</p><figure id="fig16" style="float: 0"><img src="images/waap_0306.png"><figcaption><span class="label">Figure 3-6. </span>The effects of dynamics compression</figcaption></figure><p>For games and interactive applications, you may not know
+      beforehand what your sound output will look like. Because of games’
+      dynamic nature, you may have very quiet periods (e.g., stealthy
+      sneaking) followed by very loud ones (e.g., a warzone). A compressor
+      node can be helpful in suddenly loud situations for reducing the
+      likelihood of clipping [see <a href="#s03_3" data-type="xref">Clipping and Metering</a>].</p><p>Compressors can be modeled with a compression curve with several
+      parameters, all of which can be tweaked with the Web Audio API. Two of
+      the main parameters of a <span class="keep-together">compressor</span> are threshold and ratio.
+      Threshold refers to the lowest volume at which a compressor starts
+      reducing dynamic range. Ratio determines how much gain reduction is
+      applied by the compressor. <a href="#fig17" data-type="xref">Figure 3-7</a> illustrates the
+      effect of threshold and various compression ratios on the compression
+      curve.</p><figure id="fig17" style="float: 0"><img src="images/waap_0307.png"><figcaption><span class="label">Figure 3-7. </span>A sample compression curve with basic parameters</figcaption></figure></aside></section><section id="s03_6" data-type="sect1"><h1>Dynamics Compression</h1><p>Compressors are available in the Web Audio API as
+    <code>DynamicsCompressorNodes</code>. Using moderate amounts of dynamics
+    compression in your mix is generally a good idea, especially in a game
+    setting where, as previously discussed, you don’t know exactly what sounds
+    will play and when. One case where compression should be avoided is when
+    dealing with painstakingly mastered tracks that have been tuned to sound
+    “just right” already, which are not being mixed with any other
+    tracks.</p><p>Implementing dynamic compression in the Web Audio API is simply a
+    matter of including a dynamics compressor node in your audio graph,
+    generally as the last node before the destination:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">var</code> <code class="nx">compressor</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createDynamicsCompressor</code><code class="p">();</code>
+<code class="nx">mix</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">compressor</code><code class="p">);</code>
+<code class="nx">compressor</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">context</code><code class="p">.</code><code class="nx">destination</code><code class="p">);</code></pre><p>The node can be configured with some additional parameters as
+    described in the theory section, but the defaults are quite good for most
+    purposes. For more information about configuring the compression curve,
+    see the <a href="https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html">Web
+    Audio API specification</a>.</p></section></section>
+  </body>
+</html>

@@ -1,0 +1,80 @@
+Web Audio API, 1E / 9781449332686
+RT #146095
+
+Stylesheet: Animal (realtime)
+Toolchain: SVN/csspdf
+SVN URL: https://prod.oreilly.com/internal/books/9781449332686/current
+
+Incoming format: DocBook
+Outgoing format: DocBook
+
+Preliminary pagecount (with figs): viii + 62 = 70
+
+Resources
+=========
+** Manuscript snapshot:
+https://prod.oreilly.com/internal/books/9781449332686/snapshots/manuscript_to_prod/
+
+** Intake PDFs:
+/pdf/drafts/intake_print.pdf
+/pdf/drafts/intake_web.pdf
+
+** Figs: Illustration has posted the figs. 27 total.
+
+** Intake Report:
+/tools/dbintakereport.txt
+    
+Notes from Tools
+================
+** Syntax highlighting: applied to 0 out of 49 code listings.
+
+** This is a Realtime so I turned on code wrapping and suppressed 
+the colophon in the oneoff.css.
+
+** Please let Tools know ASAP if there are any other global problems 
+for which we can help automate a fix.
+
+** Notes from Kristen
+=====================
+TOOLS:
+-Needs boilerplate added to preface (and BM)
+
+[Fixed at intake.--TOOLS]
+
+-Book is in one "content.xml" file, can we break it apart?
+
+[Fixed at intake.--TOOLS]
+
+-TOC looks pretty funky...chapters look normal, but level 1 headers 
+are in a different font.
+
+[Fixed at intake.--TOOLS]
+
+-Level 1 headers throughout book look odd, come to mention it.
+
+[Fixed at intake.--TOOLS]
+
+-URLs and xrefs are rendering with an underline (maybe this guy is 
+using his own oneoff.css?)
+
+[Fixed at intake. AU had nested xrefs and ulinks inside <emphasis 
+role="underline">, so I removed those.--TOOLS]
+
+-Rename App 1 and 2 to A, B.
+
+[Fixed at intake.--TOOLS]
+
+PROD:
+-Will need a strong proofread
+-Fix casing on headers
+-A few long code lines
+-Some unanchored URLS in the book
+-Reformat glossary as a variable list
+
+ART:
+-AU has already been in touch with Rebecca about the illustrations. 
+Look to be a lot of drawings.
+=====================
+
+Thanks,
+Sarah

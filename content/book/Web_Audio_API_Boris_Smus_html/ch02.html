@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Web Audio API</title>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"> </script>
+    <link rel="stylesheet" type="text/css" href="theme/html/html.css">
+  </head>
+  <body data-type="book">
+    <section xmlns="http://www.w3.org/1999/xhtml" id="ch02" data-type="chapter"><h1>Perfect Timing and Latency</h1><p>One of the strengths of the Web Audio API as compared to the <code>&lt;audio&gt;</code> tag is that it comes with a
+  low-latency precise-timing model.</p><p>Low latency is very important for games and other interactive
+  applications since you often need fast auditory response to user actions. If
+  the feedback is not immediate, the user will sense the delay, which will
+  lead to frustration. In practice, due to imperfections of human hearing,
+  there is leeway for a delay of up to 20 ms or so, but the number varies
+  depending on many factors.</p><p>Precise timing enables you to schedule events at specific times in the
+  future. This is very important for scripted scenes and musical
+  applications.</p><section id="s02_1" data-type="sect1"><h1>Timing Model</h1><p>One of the key things that the audio context provides is a
+    consistent timing model and frame of reference for time. Importantly, this
+    model is different from the one used for JavaScript timers such as
+    <code>setTimeout</code>, <code>setInterval</code>, and <code>new
+    Date()</code>. It is also different from the performance clock provided by
+    <code>window.performance.now()</code>.</p><p>All of the absolute times that you will be dealing with in the Web
+    Audio API are in seconds (not milliseconds!), in the coordinate system of
+    the specified audio context. The current time can be retrieved from the
+    audio context via the <code>currentTime</code> property. Although the
+    units are seconds, time is stored as a floating-point value with high
+    precision.</p></section><section id="s02_2" data-type="sect1"><h1>Precise Playback and Resume</h1><p>The <code>start()</code> function makes it easy to schedule precise
+    sound playback for games and other time-critical applications. To get this
+    working properly, ensure that your sound buffers are pre-loaded [see <a href="ch01.html#s01_8" data-type="xref">Loading and Playing Sounds</a>]. Without a <span class="keep-together">pre-loaded</span> buffer, you will have to wait an
+    unknown amount of time for the browser to fetch the sound file, and then
+    for the Web Audio API to decode it. The failure mode in this case is you
+    want to play a sound at a precise instant, but the buffer is still loading
+    or decoding.</p><p>Sounds can be scheduled to play at a precise time by specifying the
+    first (<code>when</code>) parameter of the <code>start()</code> call. This
+    parameter is in the coordinate system of the <code>AudioContext</code>’s
+    <code>currentTime</code>. If the parameter is less than the <code>currentTime</code>, it is played immediately. Thus
+    <code>start(0)</code> always plays sound immediately, but to schedule
+    sound in 5 seconds, you would call <code>start(context.currentTime +
+    5)</code>.</p><p>Sound buffers can also be played from a specific time offset by
+    specifying a second parameter to the <code>start()</code> call, and
+    limited to a specific duration with a third optional parameter. For
+    example, if we want to pause a sound and play it back from the paused
+    position, we can implement a pause by tracking the amount of time a sound
+    has been playing in the current session and also tracking the last offset
+    in order to resume later:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="c1">// Assume context is a web audio context, buffer is a pre-loaded audio buffer.</code>
+<code class="kd">var</code> <code class="nx">startOffset</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code>
+<code class="kd">var</code> <code class="nx">startTime</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code>
+
+<code class="kd">function</code> <code class="nx">pause</code><code class="p">()</code> <code class="p">{</code>
+  <code class="nx">source</code><code class="p">.</code><code class="nx">stop</code><code class="p">();</code>
+  <code class="c1">// Measure how much time passed since the last pause.</code>
+  <code class="nx">startOffset</code> <code class="o">+=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">currentTime</code> <code class="o">-</code> <code class="nx">startTime</code><code class="p">;</code>
+<code class="p">}</code></pre><p>Once a source node has finished playing back, it can’t play back
+    more. To play back the underlying buffer again, you need to create a new
+    source node (<code>AudioBufferSourceNode</code>) and call <code>start()</code>:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">function</code> <code class="nx">play</code><code class="p">()</code> <code class="p">{</code>
+  <code class="nx">startTime</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">currentTime</code><code class="p">;</code>
+  <code class="kd">var</code> <code class="nx">source</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createBufferSource</code><code class="p">();</code>
+  <code class="c1">// Connect graph</code>
+  <code class="nx">source</code><code class="p">.</code><code class="nx">buffer</code> <code class="o">=</code> <code class="k">this</code><code class="p">.</code><code class="nx">buffer</code><code class="p">;</code>
+  <code class="nx">source</code><code class="p">.</code><code class="nx">loop</code> <code class="o">=</code> <code class="kc">true</code><code class="p">;</code>
+  <code class="nx">source</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">context</code><code class="p">.</code><code class="nx">destination</code><code class="p">);</code>
+  <code class="c1">// Start playback, but make sure we stay in bound of the buffer.</code>
+  <code class="nx">source</code><code class="p">.</code><code class="nx">start</code><code class="p">(</code><code class="mi">0</code><code class="p">,</code> <code class="nx">startOffset</code> <code class="o">%</code> <code class="nx">buffer</code><code class="p">.</code><code class="nx">duration</code><code class="p">);</code>
+<code class="p">}</code></pre><p>Though recreating the source node may seem inefficient at first,
+    keep in mind that source nodes are heavily optimized for this pattern.
+    Remember that if you keep a handle to the <code>AudioBuffer</code>, you
+    don’t need to make another request to the asset to play the same sound
+    again. By having this <code>AudioBuffer</code> around, you have a clean
+    separation between buffer and player, and can easily play back multiple
+    versions of the same buffer overlapping in time. If you find yourself
+    needing to repeat this pattern, encapsulate playback with a simple helper
+    function like <code>playSound(buffer)</code> in an earlier code
+    snippet.</p></section><section id="s02_3" data-type="sect1"><h1>Scheduling Precise Rhythms</h1><p>The Web Audio API lets developers precisely schedule playback in the
+    future. To demonstrate this, let’s set up a simple rhythm track. Probably
+    the simplest and most widely known drumkit pattern is shown in <a href="#fig9" data-type="xref">Figure 2-1</a>, in which a hihat is played every eighth note, and the
+    kick and snare are played on alternating quarter notes, in 4/4
+    time.</p><figure id="fig9" style="float: 0"><img src="images/waap_0201.png"><figcaption><span class="label">Figure 2-1. </span>Sheet music for one of the most basic drum patterns</figcaption></figure><p>Assuming we have already loaded the kick, snare, and hihat buffers,
+    the code to do this is simple:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="k">for</code> <code class="p">(</code><code class="kd">var</code> <code class="nx">bar</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code> <code class="nx">bar</code> <code class="o">&lt;</code> <code class="mi">2</code><code class="p">;</code> <code class="nx">bar</code><code class="o">++</code><code class="p">)</code> <code class="p">{</code>
+  <code class="kd">var</code> <code class="nx">time</code> <code class="o">=</code> <code class="nx">startTime</code> <code class="o">+</code> <code class="nx">bar</code> <code class="o">*</code> <code class="mi">8</code> <code class="o">*</code> <code class="nx">eighthNoteTime</code><code class="p">;</code>
+  <code class="c1">// Play the bass (kick) drum on beats 1, 5</code>
+  <code class="nx">playSound</code><code class="p">(</code><code class="nx">kick</code><code class="p">,</code> <code class="nx">time</code><code class="p">);</code>
+  <code class="nx">playSound</code><code class="p">(</code><code class="nx">kick</code><code class="p">,</code> <code class="nx">time</code> <code class="o">+</code> <code class="mi">4</code> <code class="o">*</code> <code class="nx">eighthNoteTime</code><code class="p">);</code>
+
+  <code class="c1">// Play the snare drum on beats 3, 7</code>
+  <code class="nx">playSound</code><code class="p">(</code><code class="nx">snare</code><code class="p">,</code> <code class="nx">time</code> <code class="o">+</code> <code class="mi">2</code> <code class="o">*</code> <code class="nx">eighthNoteTime</code><code class="p">);</code>
+  <code class="nx">playSound</code><code class="p">(</code><code class="nx">snare</code><code class="p">,</code> <code class="nx">time</code> <code class="o">+</code> <code class="mi">6</code> <code class="o">*</code> <code class="nx">eighthNoteTime</code><code class="p">);</code>
+
+  <code class="c1">// Play the hihat every eighth note.</code>
+  <code class="k">for</code> <code class="p">(</code><code class="kd">var</code> <code class="nx">i</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code> <code class="nx">i</code> <code class="o">&lt;</code> <code class="mi">8</code><code class="p">;</code> <code class="o">++</code><code class="nx">i</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nx">playSound</code><code class="p">(</code><code class="nx">hihat</code><code class="p">,</code> <code class="nx">time</code> <code class="o">+</code> <code class="nx">i</code> <code class="o">*</code> <code class="nx">eighthNoteTime</code><code class="p">);</code>
+  <code class="p">}</code>
+<code class="p">}</code></pre><p>Once you’ve scheduled sound in the future, there is no way to
+    unschedule that future playback event, so if you are dealing with an
+    application that quickly changes, scheduling sounds too far into the
+    future is not advisable. A good way of dealing with this problem is to
+    create your own scheduler using JavaScript timers and an event queue. This
+    approach is described in <a href="http://www.html5rocks.com/en/">A Tale
+    of Two Clocks</a>.</p><p class="online_only">
+    {{jsbin width="100%" height="266px" src="http://orm-other.s3.amazonaws.com/webaudioapi/samples/rhythm/index.html"}}
+    </p></section><section id="s02_4" data-type="sect1"><h1>Changing Audio Parameters</h1><p>Many types of audio nodes have configurable parameters. For example,
+    the <code>GainNode</code> has a gain parameter that
+    controls the gain multiplier for all sounds going through the node.
+    Specifically, a gain of 1 does not affect the amplitude, 0.5 halves it,
+    and 2 doubles it [see <a href="ch03.html#s03_1" data-type="xref">Volume, Gain, and Loudness</a>]. Let’s set up a graph as
+    follows:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="c1">// Create a gain node.</code>
+<code class="kd">var</code> <code class="nx">gainNode</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createGain</code><code class="p">();</code>
+<code class="c1">// Connect the source to the gain node.</code>
+<code class="nx">source</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">gainNode</code><code class="p">);</code>
+<code class="c1">// Connect the gain node to the destination.</code>
+<code class="nx">gainNode</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">context</code><code class="p">.</code><code class="nx">destination</code><code class="p">);</code></pre><p>In the context of the API, audio parameters are represented as
+    <code>AudioParam</code> instances. The values of these nodes can be
+    changed directly by setting the <code>value</code> attribute of a param
+    instance:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="c1">// Reduce the volume.</code>
+<code class="nx">gainNode</code><code class="p">.</code><code class="nx">gain</code><code class="p">.</code><code class="nx">value</code> <code class="o">=</code> <code class="mf">0.5</code><code class="p">;</code></pre><p>The values can also be changed later, via precisely scheduled
+    parameter changes in the future. We could also use <code>setTimeout</code> to do this scheduling, but this is
+    not precise for several reasons:</p><ol><li><p>Millisecond-based timing may not be enough precision.</p></li><li><p>The main JS thread may be busy with high-priority tasks like
+        page layout, garbage collection, and callbacks from other APIs, which
+        delays timers.</p></li><li><p>The JS timer is affected by tab state. For example, interval
+        timers in backgrounded tabs fire more slowly than if the tab is in the
+        foreground.</p></li></ol><p>Instead of setting the value directly, we can call the
+    <code>setValueAtTime()</code> function, which takes a value and a start
+    time as arguments. For example, the following snippet sets the gain value
+    of a <code>GainNode</code> in one second:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="nx">gainNode</code><code class="p">.</code><code class="nx">gain</code><code class="p">.</code><code class="nx">setValueAtTime</code><code class="p">(</code><code class="mf">0.5</code><code class="p">,</code> <code class="nx">context</code><code class="p">.</code><code class="nx">currentTime</code> <code class="o">+</code> <code class="mi">1</code><code class="p">);</code></pre><p class="online_only">
+    <?jsbin width="100%" height="315px" src="http://orm-other.s3.amazonaws.com/webaudioapi/samples/volume/index.html"?>
+    
+    </p></section><section id="s02_5" data-type="sect1"><h1>Gradually Varying Audio Parameters</h1><p>In many cases, rather than changing a parameter abruptly, you would
+    prefer a more gradual change. For example, when building a music player
+    application, we want to fade the current track out, and fade the new one
+    in, to avoid a jarring transition. While you can achieve this with
+    multiple calls to <code>setValueAtTime</code> as
+    described previously, this is inconvenient.</p><p>The Web Audio API provides a convenient set of
+    <code>RampToValue</code> methods to gradually change the value of any
+    parameter. These functions are <code>linearRampToValueAtTime()</code> and
+    <code>exponentialRampToValueAtTime()</code>. The difference between these
+    two lies in the way the transition happens. In some cases, an exponential
+    transition makes more sense, since we perceive many aspects of sound in an
+    exponential manner.</p><p>Let’s take an example of scheduling a crossfade in the future. Given
+    a playlist, we can transition between tracks by scheduling a gain decrease
+    on the currently playing track, and a gain increase on the next one, both
+    slightly before the current track finishes <span class="keep-together">playing</span>:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">function</code> <code class="nx">createSource</code><code class="p">(</code><code class="nx">buffer</code><code class="p">)</code> <code class="p">{</code>
+  <code class="kd">var</code> <code class="nx">source</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createBufferSource</code><code class="p">();</code>
+  <code class="kd">var</code> <code class="nx">gainNode</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createGainNode</code><code class="p">();</code>
+  <code class="nx">source</code><code class="p">.</code><code class="nx">buffer</code> <code class="o">=</code> <code class="nx">buffer</code><code class="p">;</code>
+  <code class="c1">// Connect source to gain.</code>
+  <code class="nx">source</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">gainNode</code><code class="p">);</code>
+  <code class="c1">// Connect gain to destination.</code>
+  <code class="nx">gainNode</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">context</code><code class="p">.</code><code class="nx">destination</code><code class="p">);</code>
+
+  <code class="k">return</code> <code class="p">{</code>
+    <code class="nx">source</code><code class="o">:</code> <code class="nx">source</code><code class="p">,</code>
+    <code class="nx">gainNode</code><code class="o">:</code> <code class="nx">gainNode</code>
+  <code class="p">};</code>
+<code class="p">}</code>
+
+<code class="kd">function</code> <code class="nx">playHelper</code><code class="p">(</code><code class="nx">buffers</code><code class="p">,</code> <code class="nx">iterations</code><code class="p">,</code> <code class="nx">fadeTime</code><code class="p">)</code> <code class="p">{</code>
+  <code class="kd">var</code> <code class="nx">currTime</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">currentTime</code><code class="p">;</code>
+  <code class="k">for</code> <code class="p">(</code><code class="kd">var</code> <code class="nx">i</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code> <code class="nx">i</code> <code class="o">&lt;</code> <code class="nx">iterations</code><code class="p">;</code> <code class="nx">i</code><code class="o">++</code><code class="p">)</code> <code class="p">{</code>
+    <code class="c1">// For each buffer, schedule its playback in the future.</code>
+    <code class="k">for</code> <code class="p">(</code><code class="kd">var</code> <code class="nx">j</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code> <code class="nx">j</code> <code class="o">&lt;</code> <code class="nx">buffers</code><code class="p">.</code><code class="nx">length</code><code class="p">;</code> <code class="nx">j</code><code class="o">++</code><code class="p">)</code> <code class="p">{</code>
+      <code class="kd">var</code> <code class="nx">buffer</code> <code class="o">=</code> <code class="nx">buffers</code><code class="p">[</code><code class="nx">j</code><code class="p">];</code>
+      <code class="kd">var</code> <code class="nx">duration</code> <code class="o">=</code> <code class="nx">buffer</code><code class="p">.</code><code class="nx">duration</code><code class="p">;</code>
+      <code class="kd">var</code> <code class="nx">info</code> <code class="o">=</code> <code class="nx">createSource</code><code class="p">(</code><code class="nx">buffer</code><code class="p">);</code>
+      <code class="kd">var</code> <code class="nx">source</code> <code class="o">=</code> <code class="nx">info</code><code class="p">.</code><code class="nx">source</code><code class="p">;</code>
+      <code class="kd">var</code> <code class="nx">gainNode</code> <code class="o">=</code> <code class="nx">info</code><code class="p">.</code><code class="nx">gainNode</code><code class="p">;</code>
+      <code class="c1">// Fade it in.</code>
+      <code class="nx">gainNode</code><code class="p">.</code><code class="nx">gain</code><code class="p">.</code><code class="nx">linearRampToValueAtTime</code><code class="p">(</code><code class="mi">0</code><code class="p">,</code> <code class="nx">currTime</code><code class="p">);</code>
+      <code class="nx">gainNode</code><code class="p">.</code><code class="nx">gain</code><code class="p">.</code><code class="nx">linearRampToValueAtTime</code><code class="p">(</code><code class="mi">1</code><code class="p">,</code> <code class="nx">currTime</code> <code class="o">+</code> <code class="nx">fadeTime</code><code class="p">);</code>
+      <code class="c1">// Then fade it out.</code>
+      <code class="nx">gainNode</code><code class="p">.</code><code class="nx">gain</code><code class="p">.</code><code class="nx">linearRampToValueAtTime</code><code class="p">(</code><code class="mi">1</code><code class="p">,</code> <code class="nx">currTime</code> <code class="o">+</code> <code class="nx">duration</code><code class="o">-</code><code class="nx">fadeTime</code><code class="p">);</code>
+      <code class="nx">gainNode</code><code class="p">.</code><code class="nx">gain</code><code class="p">.</code><code class="nx">linearRampToValueAtTime</code><code class="p">(</code><code class="mi">0</code><code class="p">,</code> <code class="nx">currTime</code> <code class="o">+</code> <code class="nx">duration</code><code class="p">);</code>
+
+      <code class="c1">// Play the track now.</code>
+      <code class="nx">source</code><code class="p">.</code><code class="nx">noteOn</code><code class="p">(</code><code class="nx">currTime</code><code class="p">);</code>
+
+      <code class="c1">// Increment time for the next iteration.</code>
+      <code class="nx">currTime</code> <code class="o">+=</code> <code class="nx">duration</code> <code class="o">-</code> <code class="nx">fadeTime</code><code class="p">;</code>
+    <code class="p">}</code>
+  <code class="p">}</code>
+<code class="p">}</code></pre><p class="online_only">
+    <?jsbin width="100%" height="272px" src="http://orm-other.s3.amazonaws.com/webaudioapi/samples/crossfade-playlist/index.html"?>
+    </p></section><section id="s02_6" data-type="sect1"><h1>Custom Timing Curves</h1><p>If neither a linear nor an exponential curve satisfies your needs,
+    you can also specify your own value curve via an array of values using the
+    <code>setValueCurveAtTime</code> function. With this function, you can
+    define a custom timing curve by providing an array of timing values. It’s
+    a shortcut for making a bunch of <code>setValueAtTime</code> calls, and
+    should be used in this case. For example, if we want to create a tremolo
+    effect, we can apply an oscillating curve to the gain
+    <code>AudioParam</code> of a <code>GainNode</code>, as in <a href="#fig10" data-type="xref">Figure 2-2</a>.</p><figure id="fig10" style="float: 0"><img src="images/waap_0202.png"><figcaption><span class="label">Figure 2-2. </span>A value curve oscillating over time</figcaption></figure><p>The oscillating curve in the previous figure could be implemented
+    with the following code:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">var</code> <code class="nx">DURATION</code> <code class="o">=</code> <code class="mi">2</code><code class="p">;</code>
+<code class="kd">var</code> <code class="nx">FREQUENCY</code> <code class="o">=</code> <code class="mi">1</code><code class="p">;</code>
+<code class="kd">var</code> <code class="nx">SCALE</code> <code class="o">=</code> <code class="mf">0.4</code><code class="p">;</code>
+
+<code class="c1">// Split the time into valueCount discrete steps.</code>
+<code class="kd">var</code> <code class="nx">valueCount</code> <code class="o">=</code> <code class="mi">4096</code><code class="p">;</code>
+<code class="c1">// Create a sinusoidal value curve.</code>
+<code class="kd">var</code> <code class="nx">values</code> <code class="o">=</code> <code class="k">new</code> <code class="nx">Float32Array</code><code class="p">(</code><code class="nx">valueCount</code><code class="p">);</code>
+<code class="k">for</code> <code class="p">(</code><code class="kd">var</code> <code class="nx">i</code> <code class="o">=</code> <code class="mi">0</code><code class="p">;</code> <code class="nx">i</code> <code class="o">&lt;</code> <code class="nx">valueCount</code><code class="p">;</code> <code class="nx">i</code><code class="o">++</code><code class="p">)</code> <code class="p">{</code>
+  <code class="kd">var</code> <code class="nx">percent</code> <code class="o">=</code> <code class="p">(</code><code class="nx">i</code> <code class="o">/</code> <code class="nx">valueCount</code><code class="p">)</code> <code class="o">*</code> <code class="nx">DURATION</code><code class="o">*</code><code class="nx">FREQUENCY</code><code class="p">;</code>
+  <code class="nx">values</code><code class="p">[</code><code class="nx">i</code><code class="p">]</code> <code class="o">=</code> <code class="mi">1</code> <code class="o">+</code> <code class="p">(</code><code class="nb">Math</code><code class="p">.</code><code class="nx">sin</code><code class="p">(</code><code class="nx">percent</code> <code class="o">*</code> <code class="mi">2</code><code class="o">*</code><code class="nb">Math</code><code class="p">.</code><code class="nx">PI</code><code class="p">)</code> <code class="o">*</code> <code class="nx">SCALE</code><code class="p">);</code>
+  <code class="c1">// Set the last value to one, to restore playbackRate to normal at the end.</code>
+  <code class="k">if</code> <code class="p">(</code><code class="nx">i</code> <code class="o">==</code> <code class="nx">valueCount</code> <code class="o">-</code> <code class="mi">1</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nx">values</code><code class="p">[</code><code class="nx">i</code><code class="p">]</code> <code class="o">=</code> <code class="mi">1</code><code class="p">;</code>
+  <code class="p">}</code>
+<code class="p">}</code>
+<code class="c1">// Apply it to the gain node immediately, and make it last for 2 seconds.</code>
+<code class="k">this</code><code class="p">.</code><code class="nx">gainNode</code><code class="p">.</code><code class="nx">gain</code><code class="p">.</code><code class="nx">setValueCurveAtTime</code><code class="p">(</code><code class="nx">values</code><code class="p">,</code> <code class="nx">context</code><code class="p">.</code><code class="nx">currentTime</code><code class="p">,</code> <code class="nx">DURATION</code><code class="p">);</code></pre><p>In the previous snippet, we’ve manually computed a sine curve and
+    applied it to the gain parameter to create a tremolo sound effect. It took
+    a bit of math, though.</p><p>This brings us to a very nifty feature of the Web Audio API that
+    lets us build effects like tremolo more easily. We can take any audio
+    stream that would ordinarily be connected into another
+    <code>AudioNode</code>, and instead connect it into any
+    <code>AudioParam</code>. This important idea is the basis for many sound
+    effects. The previous code is actually an example of such an effect called
+    a low frequency oscillator (LFO) applied to the gain, which is used to
+    build effects such as vibrato, phasing, and tremolo. By using the
+    oscillator node [see <a href="ch04.html#s04_5" data-type="xref">Oscillator-Based Direct Sound Synthesis</a>], we can easily rebuild the
+    previous example as follows:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="c1">// Create oscillator.</code>
+<code class="kd">var</code> <code class="nx">osc</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createOscillator</code><code class="p">();</code>
+<code class="nx">osc</code><code class="p">.</code><code class="nx">frequency</code><code class="p">.</code><code class="nx">value</code> <code class="o">=</code> <code class="nx">FREQUENCY</code><code class="p">;</code>
+<code class="kd">var</code> <code class="nx">gain</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createGain</code><code class="p">();</code>
+<code class="nx">gain</code><code class="p">.</code><code class="nx">gain</code><code class="p">.</code><code class="nx">value</code> <code class="o">=</code> <code class="nx">SCALE</code><code class="p">;</code>
+<code class="nx">osc</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">gain</code><code class="p">);</code>
+<code class="nx">gain</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="k">this</code><code class="p">.</code><code class="nx">gainNode</code><code class="p">.</code><code class="nx">gain</code><code class="p">);</code>
+
+<code class="c1">// Start immediately, and stop in 2 seconds.</code>
+<code class="nx">osc</code><code class="p">.</code><code class="nx">start</code><code class="p">(</code><code class="mi">0</code><code class="p">);</code>
+<code class="nx">osc</code><code class="p">.</code><code class="nx">stop</code><code class="p">(</code><code class="nx">context</code><code class="p">.</code><code class="nx">currentTime</code> <code class="o">+</code> <code class="nx">DURATION</code><code class="p">);</code></pre><p>The latter approach is more efficient than creating a custom value
+    curve and saves us from having to compute sine functions manually by
+    creating a loop to repeat the effect.</p></section></section>
+  </body>
+</html>

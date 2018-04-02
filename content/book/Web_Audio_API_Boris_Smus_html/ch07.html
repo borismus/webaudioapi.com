@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Web Audio API</title>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"> </script>
+    <link rel="stylesheet" type="text/css" href="theme/html/html.css">
+  </head>
+  <body data-type="book">
+    <section xmlns="http://www.w3.org/1999/xhtml" id="ch07" data-type="chapter"><h1>Integrating with Other Technologies</h1><p>The Web Audio API makes audio processing and analysis a fundamental
+  part of the web platform. As a core building block for web developers, it is
+  designed to play well with other technologies.</p><section id="s07_1" data-type="sect1"><h1>Setting Up Background Music with the &lt;audio&gt; Tag</h1><p>As I mentioned at the very start of the book, the <code>&lt;audio&gt;</code> tag has many limitations that make
+    it undesirable for games and interactive applications. One advantage of
+    this HTML5 feature, however, is that it has built-in buffering and
+    streaming support, making it ideal for long-form playback. Loading a large
+    buffer is slow from a network perspective, and expensive from a
+    memory-management perspective. The <code>&lt;audio&gt;</code> tag setup is ideal for music
+    playback or for a game soundtrack.</p><p>Rather than going the usual path of loading a sound directly by
+    issuing an <code>XMLHttpRequest</code> and then
+    decoding the buffer, you can use the media stream audio source node
+    (<code>MediaElementAudioSourceNode</code>) to create
+    nodes that behave much like audio source nodes (<code>AudioSourceNode</code>), but wrap an existing
+    <code>&lt;audio&gt;</code> tag. Once we have this node connected to
+    our audio graph, we can use our knowledge of the Web Audio API to do great
+    things. This small example applies a low-pass filter to the <code>&lt;audio&gt;</code> tag:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true">window.addEventListener('load', onLoad, false);
+
+function onLoad() {
+  var audio = new Audio();
+  source = context.createMediaElementSource(audio);
+  var filter = context.createBiquadFilter();
+  filter.type = filter.LOWPASS;
+  filter.frequency.value = 440;
+
+  source.connect(this.filter);
+  filter.connect(context.destination);
+  audio.src = '<a href="http://example.com/the.mp3"><em class="hyperlink">http://example.com/the.mp3</em></a>';
+  audio.play();
+}</pre></section><section id="s07_2" data-type="sect1"><h1>Live Audio Input</h1><p>One highly requested feature of the Web Audio API is integration
+    with <code>getUserMedia</code>, which gives browsers
+    access to the audio/video stream of connected microphones and cameras. At
+    the time of this writing, this feature is available behind a flag in
+    Chrome. To enable it, you need to visit <code>about:flags</code> and turn on the “Web Audio Input”
+    experiment, as in <a href="#fig27" data-type="xref">Figure 7-1</a>.</p><figure id="fig27" style="float: 0"><img src="images/waap_0701.png"><figcaption><span class="label">Figure 7-1. </span>Enabling web audio input in Chrome</figcaption></figure><p>Once this is enabled, you can use the <code>MediaStreamSourceNode</code> Web Audio node. This node
+    wraps around the audio stream object that is available once the stream is
+    established. This is directly analogous to the way that <code>MediaElementSourceNode</code>s wrap <code>&lt;audio&gt;</code> elements. In the following sample,
+    we visualize the live audio input that has been processed by a notch
+    filter:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="kd">function</code> <code class="nx">getLiveInput</code><code class="p">()</code> <code class="p">{</code>
+  <code class="c1">// Only get the audio stream.</code>
+  <code class="nx">navigator</code><code class="p">.</code><code class="nx">webkitGetUserMedia</code><code class="p">({</code><code class="nx">audio</code><code class="o">:</code> <code class="kc">true</code><code class="p">},</code> <code class="nx">onStream</code><code class="p">,</code> <code class="nx">onStreamError</code><code class="p">);</code>
+<code class="p">};</code>
+
+<code class="kd">function</code> <code class="nx">onStream</code><code class="p">(</code><code class="nx">stream</code><code class="p">)</code> <code class="p">{</code>
+  <code class="c1">// Wrap a MediaStreamSourceNode around the live input stream.</code>
+  <code class="kd">var</code> <code class="nx">input</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createMediaStreamSource</code><code class="p">(</code><code class="nx">stream</code><code class="p">);</code>
+  <code class="c1">// Connect the input to a filter.</code>
+  <code class="kd">var</code> <code class="nx">filter</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createBiquadFilter</code><code class="p">();</code>
+  <code class="nx">filter</code><code class="p">.</code><code class="nx">frequency</code><code class="p">.</code><code class="nx">value</code> <code class="o">=</code> <code class="mf">60.0</code><code class="p">;</code>
+  <code class="nx">filter</code><code class="p">.</code><code class="nx">type</code> <code class="o">=</code> <code class="nx">filter</code><code class="p">.</code><code class="nx">NOTCH</code><code class="p">;</code>
+  <code class="nx">filter</code><code class="p">.</code><code class="nx">Q</code> <code class="o">=</code> <code class="mf">10.0</code><code class="p">;</code>
+
+  <code class="kd">var</code> <code class="nx">analyser</code> <code class="o">=</code> <code class="nx">context</code><code class="p">.</code><code class="nx">createAnalyser</code><code class="p">();</code>
+
+  <code class="c1">// Connect graph.</code>
+  <code class="nx">input</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">filter</code><code class="p">);</code>
+  <code class="nx">filter</code><code class="p">.</code><code class="nx">connect</code><code class="p">(</code><code class="nx">analyser</code><code class="p">);</code>
+
+  <code class="c1">// Set up an animation.</code>
+  <code class="nx">requestAnimationFrame</code><code class="p">(</code><code class="nx">render</code><code class="p">);</code>
+<code class="p">};</code>
+
+<code class="kd">function</code> <code class="nx">onStreamError</code><code class="p">(</code><code class="nx">e</code><code class="p">)</code> <code class="p">{</code>
+  <code class="nx">console</code><code class="p">.</code><code class="nx">error</code><code class="p">(</code><code class="nx">e</code><code class="p">);</code>
+<code class="p">};</code>
+
+<code class="kd">function</code> <code class="nx">render</code><code class="p">()</code> <code class="p">{</code>
+  <code class="c1">// Visualize the live audio input.</code>
+  <code class="nx">requestAnimationFrame</code><code class="p">(</code><code class="nx">render</code><code class="p">);</code>
+<code class="p">};</code></pre><p>Another way to establish streams is based on a WebRTC
+    PeerConnection. By bringing a communication stream into the Web Audio API,
+    you could, for example, spatialize multiple participants in a video
+    conference.</p></section><section id="s07_3" data-type="sect1"><h1>Page Visibility and Audio Playback</h1><p>Whenever you develop a web application that involves audio playback,
+    you should be cognizant of the state of the page. The classic failure mode
+    here is that one of many tabs is playing sound, but you have no idea which
+    one it is. This may make sense for a music player application, in which
+    you want music to continue playing regardless of the visibility of the
+    page. However, for a game, you often want to pause gameplay (and sound
+    playback) when the page is no longer in the foreground.</p><p>Luckily, the Page Visibility API provides functionality to detect
+    when a page becomes hidden or visible. The state can be determined from
+    the Boolean <code>document.hidden</code> property.
+    The event that fires when the visibility changes is called <code>visibilitychange</code>. Because the API is still
+    considered to be experimental, all of these names are webkit-prefixed.
+    With this in mind, the following code will stop a source node when a page
+    becomes hidden, and resume it when the page becomes visible:</p><pre data-type="programlisting" data-code-language="javascript" data-highlighted="true"><code class="c1">// Listen to the webkitvisibilitychange event.</code>
+<code class="nb">document</code><code class="p">.</code><code class="nx">addEventListener</code><code class="p">(</code><code class="s1">'webkitvisibilitychange'</code><code class="p">,</code> <code class="nx">onVisibilityChange</code><code class="p">);</code>
+
+<code class="kd">function</code> <code class="nx">onVisibilityChange</code><code class="p">()</code> <code class="p">{</code>
+  <code class="k">if</code> <code class="p">(</code><code class="nb">document</code><code class="p">.</code><code class="nx">webkitHidden</code><code class="p">)</code> <code class="p">{</code>
+    <code class="nx">source</code><code class="p">.</code><code class="nx">stop</code><code class="p">(</code><code class="mi">0</code><code class="p">);</code>
+  <code class="p">}</code> <code class="k">else</code> <code class="p">{</code>
+    <code class="nx">source</code><code class="p">.</code><code class="nx">start</code><code class="p">(</code><code class="mi">0</code><code class="p">);</code>
+  <code class="p">}</code>
+<code class="p">}</code></pre></section></section>
+  </body>
+</html>

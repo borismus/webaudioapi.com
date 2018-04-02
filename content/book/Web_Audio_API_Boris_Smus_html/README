@@ -1,0 +1,19 @@
+You are looking at a live production repository. The XML markup has been normalized for the particular flavor of DocBook that our toolchain needs.
+
+Your production editor will be working on these files on a daily basis and will be notified every time you make a change. Please defer to your 
+production editor about coordinating the entering of edits in your book. To facilitate transparent coordination of changes made to the files, 
+please be sure to enter a descriptive log message with each commit you make. 
+
+Please consult your production editor or write to toolsreq@oreilly.com before making any changes related to:
+* Images or image file structure
+* General XML file structure
+
+Please do not work in any old checkouts you may have of the external repository (https://prod.oreilly.com/external/authors/books/ISBN/current/).
+That repo is no longer in use.
+
+My Book Went to Press, Now What?
+================================
+
+Once the book goes to press, you are free to make further updates to the book content as you and your editor see fit. When you are ready to 
+release an update of your book, please contact toolsreq@oreilly.com.
+
