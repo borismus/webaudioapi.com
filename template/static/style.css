@@ -93,3 +93,19 @@ input[type="checkbox"]:checked + label span {
 blockquote {
   font-style: italic;
 }
+
+#overlay {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 80%);
+  width: 100vw;
+  height: 100vh;
+  display: none;
+  justify-content: center;
+  padding-top: 15em;
+}
+#overlay.visible {
+  display: flex;
+}
