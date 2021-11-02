@@ -9,9 +9,11 @@ description: Lets you adjust gain and show when clipping happens.
   .noclip {background: #00FF66;}
 </style>
 
-<button click="sample.playPause()">Play/pause</button>
+<button>Play/pause</button>
+<span id="sample-controls" style="display: none">
 Master gain: <input type="range" min="0" step="0.1" max="10" oninput="sample.gainRangeChanged(this)">
 Meter level: <span id="meter"></span>
+</span>
 
 <script src="/static/js/shared.js"></script>
 <script src="metering-sample.js"></script>
@@ -20,5 +22,6 @@ sample = new MeteringSample(document.querySelector('#meter'));
 
 document.querySelector('button').addEventListener('click', function() {
   sample.playPause();
+  document.querySelector('#sample-controls').style.display = '';
 });
 </script>
