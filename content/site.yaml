@@ -1,4 +1,5 @@
 site_title: Web Audio API
+site_domain: https://webaudioapi.com
 date_format: '%Y-%m-%d'
 permalink_formats:
   post: 'samples/{{slug}}'
