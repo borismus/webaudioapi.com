@@ -1,6 +1,16 @@
 // Start off by initializing a new context.
 context = new (window.AudioContext || window.webkitAudioContext)();
 
+if (context.state === 'suspended') {
+  const overlay = document.getElementById('overlay');
+  overlay.className = 'visible';
+  document.addEventListener('click', () => {
+    context.resume().then(() => {
+      overlay.className = 'hidden';
+    });
+  }, {once: true});
+}
+
 if (!context.createGain)
   context.createGain = context.createGainNode;
 if (!context.createDelay)
