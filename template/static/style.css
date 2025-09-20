@@ -94,6 +94,10 @@ blockquote {
   font-style: italic;
 }
 
+img {
+  width: 100%;
+}
+
 #overlay {
   position: absolute;
   z-index: 1;
