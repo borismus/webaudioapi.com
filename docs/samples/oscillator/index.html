@@ -1,6 +1,7 @@
 <!doctype html>
 <head>
-<link href='//fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+<meta charset="utf-8">
+<link href='https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap' rel='stylesheet' type='text/css'>
 
 <title>Oscillator | Web Audio API</title>
 
@@ -38,7 +39,7 @@
     <!-- Change between different Oscillator types. Also have a dragger
      thing for frequency and detune, and visualize the result. -->
 
-<p><canvas style="background: white;"></canvas></p>
+<canvas style="background: white;"></canvas>
 
 <div>
 Frequency: <input id="frequency" type="range" min="0" max="1000"
@@ -60,13 +61,11 @@ onclick="sample.changeType('triangle')">Triangle</input>
 </div>
 
 <p><button onclick="sample.toggle()">Play/pause</button></p>
-
 <script src="/static/js/shared.js"></script>
 <script src="oscillator-sample.js"></script>
 <script>
 var sample = new OscillatorSample();
 </script>
-
   </p>
 </div>
 

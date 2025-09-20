@@ -1,6 +1,7 @@
 <!doctype html>
 <head>
-<link href='//fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+<meta charset="utf-8">
+<link href='https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap' rel='stylesheet' type='text/css'>
 
 <title>Audio Tag | Web Audio API</title>
 
@@ -39,10 +40,8 @@
     <p>A couple issues: <code>onload</code> is required <a href="http://crbug.com/112368">http://crbug.com/112368</a>. Also,
 reassigning the <code>@src</code> attribute causes audio glitches
 <a href="http://crbug.com/162528">http://crbug.com/162528</a>.</p>
-
 <p><input value="chrono.mp3" placeholder="URL to audio file...">
 <button onclick="sample.play(document.querySelector('input').value)">Load URL</button></p>
-
 <script src="/static/js/shared.js"></script>
 <script src="audio-tag-sample.js"></script>
 <script>
@@ -51,7 +50,6 @@ var sample = new AudioTagSample();
 
 sample.play(input.value);
 </script>
-
   </p>
 </div>
 
