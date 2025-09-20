@@ -7,13 +7,9 @@ Welcome to the home of the book "Web Audio API: Advanced Sound for Games and Int
 
 ![Web Audio API Book Cover](book/web-audio-api-cover.jpg)
 
-# Samples
-
-This site hosts interactive Web Audio [samples][] which are referenced in the book.
-
 # Read for free
 
-The author released the book for free under the [CC license][cc]. It's available to read online in a few formats:
+The book can be read for free under the [CC license][cc]. It's available in the following formats:
 
 - [HTML][html]
 - [PDF][pdf]
@@ -28,13 +24,17 @@ The author released the book for free under the [CC license][cc]. It's available
 [mobi]: book/Web_Audio_API_Boris_Smus.mobi
 [pdf]: book/Web_Audio_API_Boris_Smus.pdf
 
+# Samples
+
+This site hosts interactive Web Audio [samples][] which are referenced in the book.
+
 
 # Translations
 
 The community has kindly submitted translations of "Web Audio API" which are also freely available under the same [CC license][cc].
 
-- [Japanese translation][jp] (huge thanks to Takasaki Takuya and Top Studio Inc)
-- [Russian translation][ru] (huge thanks to Александр Григоренко)
+- [Japanese translation][jp], thanks to Takasaki Takuya and Top Studio Inc.
+- [Russian translation][ru], huge thanks to [Александр Григоренко][alexander]
 
 [ru]: https://alexgriss.tech/web-audio-api-book/
 [jp]: book/Web_Audio_API_Boris_Smus_japanese_translation_Takuya.epub
@@ -48,7 +48,7 @@ The community has kindly submitted translations of "Web Audio API" which are als
 # Found an error?
 
 If you find an error on this page or in one of the samples, please [contact
-Boris][boris] or better yet, [submit a github issue][gh].
+Boris][boris] or [submit a github issue][gh].
 
 &mdash; [Boris Smus][boris]
 
@@ -57,3 +57,4 @@ Boris][boris] or better yet, [submit a github issue][gh].
 [orly]: http://shop.oreilly.com/product/0636920025948.do
 [amzn]: http://www.amazon.com/Web-Audio-API-Boris-Smus/dp/1449332684
 [samples]: /samples/
+[alexander]: https://alexgriss.tech/
